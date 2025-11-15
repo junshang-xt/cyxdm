@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>浪漫花园 - 我们的爱情花园</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #f5d6d6 0%, #d6f5e0 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* 背景装饰 */
+        .bg-decoration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.4;
+        }
+        
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: float 30s linear infinite;
+        }
+        
+        .cloud-1 {
+            width: 100px;
+            height: 60px;
+            top: 10%;
+            left: -10%;
+            animation-duration: 90s;
+        }
+        
+        .cloud-2 {
+            width: 150px;
+            height: 80px;
+            top: 20%;
+            left: -15%;
+            animation-duration: 120s;
+            animation-delay: 20s;
+        }
+        
+        .cloud-3 {
+            width: 120px;
+            height: 70px;
+            top: 5%;
+            left: -12%;
+            animation-duration: 100s;
+            animation-delay: 10s;
+        }
+        
+        @keyframes float {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(2000px); }
+        }
+        
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* 标题样式 */
+        .title-section {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 30px;
+        }
+        
+        .main-title {
+            font-size: 3rem;
+            color: #ff6b81;
+            text-shadow: 3px 3px 0px rgba(255, 107, 129, 0.2);
+            margin-bottom: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #5f27cd;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* 花园区域 */
+        .garden-container {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%2391c788" fill-opacity="0.5"/><path d="M0,0 L100,100 M100,0 L0,100" stroke="%2374a765" stroke-opacity="0.3" stroke-width="1"/></svg>');
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            min-height: 500px;
+            overflow: hidden;
+        }
+        
+        /* 花园网格 */
+        .garden-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .garden-cell {
+            width: 100%;
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .garden-cell:hover {
+            background: rgba(255, 255, 255, 0.5);
+            transform: scale(1.05);
+        }
+        
+        .garden-cell.planted {
+            cursor: default;
+        }
+        
+        /* 花朵样式 */
+        .flower {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%;
+            height: 60%;
+            transition: all 0.5s ease;
+        }
+        
+        .flower:hover {
+            transform: translate(-50%, -50%) scale(1.2) rotate(5deg);
+        }
+        
+        .flower-core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 2;
+        }
+        
+        .flower-petal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 30%;
+            height: 30%;
+            border-radius: 50%;
+            z-index: 1;
+            transform-origin: 50% 50%;
+        }
+        
+        .flower-stem {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8%;
+            height: 50%;
+            z-index: 0;
+        }
+        
+        /* 工具面板 */
+        .tool-panel {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tool-button {
+            background: linear-gradient(45deg, #ff9ff3, #54a0ff);
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tool-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .tool-button.active {
+            background: linear-gradient(45deg, #54a0ff, #ff9ff3);
+            transform: translateY(-2px);
+        }
+        
+        /* 状态面板 */
+        .status-panel {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .status-text {
+            font-size: 1.1rem;
+            color: #5f27cd;
+            margin-bottom: 10px;
+        }
+        
+        .love-points {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff6b81;
+            animation: glow 1.5s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 5px #ff6b81; }
+            to { text-shadow: 0 0 20px #ff6b81, 0 0 30px #ff6b81, 0 0 40px #ff6b81; }
+        }
+        
+        /* 爱的留言板 */
+        .message-board {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .message-title {
+            font-size: 1.5rem;
+            color: #ff6b81;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .message-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ffd1d1;
+            border-radius: 10px;
+            font-size: 1rem;
+            resize: none;
+            margin-bottom: 15px;
+        }
+        
+        .message-input:focus {
+            outline: none;
+            border-color: #ff6b81;
+        }
+        
+        .submit-message {
+            background: linear-gradient(45deg, #ff6b81, #ff9ff3);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .submit-message:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .message-list {
+            margin-top: 20px;
+        }
+        
+        .message-item {
+            background: #fff5f5;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 返回按钮 */
+        .back-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(45deg, #54a0ff, #5f27cd);
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        }
+        
+        /* 成就弹窗 */
+        .achievement-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            animation: modalAppear 0.5s ease;
+        }
+        
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+        
+        .achievement-icon {
+            font-size: 3rem;
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+        
+        .achievement-title {
+            font-size: 1.8rem;
+            color: #ff6b81;
+            margin-bottom: 10px;
+        }
+        
+        .achievement-description {
+            font-size: 1.1rem;
+            color: #5f27cd;
+            margin-bottom: 20px;
+        }
+        
+        .achievement-close {
+            background: linear-gradient(45deg, #ff6b81, #ff9ff3);
+            border: none;
+            border-radius: 50px;
+            padding: 10px 25px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .achievement-close:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* 爱心雨效果 */
+        .heart {
+            position: fixed;
+            top: -10%;
+            transform: translateY(0);
+            animation: fall linear forwards;
+            z-index: 99;
+        }
+        
+        @keyframes fall {
+            to {
+                transform: translateY(110vh);
+            }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .garden-container {
+                padding: 20px;
+            }
+            
+            .garden-grid {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+                gap: 8px;
+            }
+            
+            .back-button {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-title {
+                font-size: 1.8rem;
+            }
+            
+            .garden-grid {
+                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+                gap: 5px;
+            }
+            
+            .tool-button {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .achievement-modal {
+                width: 90%;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景装饰 -->
+    <div class="bg-decoration">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+    </div>
+    
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- 标题部分 -->
+        <div class="title-section">
+            <h1 class="main-title">浪漫花园</h1>
+            <p class="subtitle">在这片花园里，种下我们的爱情之花，让它茁壮成长</p>
+        </div>
+        
+        <!-- 状态面板 -->
+        <div class="status-panel">
+            <p class="status-text">精心照料你的花园，让爱情之花绽放</p>
+            <p class="love-points">爱情指数: <span id="lovePoints">0</span></p>
+        </div>
+        
+        <!-- 工具面板 -->
+        <div class="tool-panel">
+            <button class="tool-button" id="plantFlower">种植花朵</button>
+            <button class="tool-button" id="waterFlower">浇水 (恢复生机)</button>
+            <button class="tool-button" id="fertilizeFlower">施肥 (加速生长)</button>
+            <button class="tool-button" id="removeFlower">移除花朵</button>
+        </div>
+        
+        <!-- 花园区域 -->
+        <div class="garden-container">
+            <div class="garden-grid" id="gardenGrid">
+                <!-- 花园格子将由JavaScript动态生成 -->
+            </div>
+        </div>
+        
+        <!-- 爱的留言板 -->
+        <div class="message-board">
+            <h2 class="message-title">爱的留言板</h2>
+            <textarea class="message-input" id="messageInput" rows="4" placeholder="在这里写下你想对TA说的话..."></textarea>
+            <button class="submit-message" id="submitMessage">种下爱的留言</button>
+            <div class="message-list" id="messageList">
+                <!-- 留言将由JavaScript动态生成 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 返回按钮 -->
+    <button class="back-button" id="backButton">↩</button>
+    
+    <!-- 成就弹窗 -->
+    <div class="achievement-modal" id="achievementModal">
+        <div class="achievement-icon">🏆</div>
+        <h3 class="achievement-title" id="achievementTitle">新成就！</h3>
+        <p class="achievement-description" id="achievementDescription">恭喜你获得了新成就</p>
+        <button class="achievement-close" id="achievementClose">太棒了！</button>
+    </div>
+    
+    <script>
+        // 全局变量
+        let currentTool = 'plantFlower';
+        let lovePoints = 0;
+        let plantedFlowers = 0;
+        let messageCount = 0;
+        const gardenSize = 25; // 5x5 网格
+        const flowerTypes = [
+            { color: '#ff6b81', coreColor: '#ff9ff3', stemColor: '#1dd1a1' }, // 粉色
+            { color: '#54a0ff', coreColor: '#5f27cd', stemColor: '#10ac84' }, // 蓝色
+            { color: '#ff9f43', coreColor: '#ff6348', stemColor: '#00d2d3' }, // 橙色
+            { color: '#10ac84', coreColor: '#54a0ff', stemColor: '#54a0ff' }, // 绿色
+            { color: '#ff6348', coreColor: '#ff9f43', stemColor: '#10ac84' }  // 红色
+        ];
+        
+        // DOM 元素
+        const gardenGrid = document.getElementById('gardenGrid');
+        const lovePointsElement = document.getElementById('lovePoints');
+        const toolButtons = document.querySelectorAll('.tool-button');
+        const messageInput = document.getElementById('messageInput');
+        const messageList = document.getElementById('messageList');
+        const submitMessageButton = document.getElementById('submitMessage');
+        const backButton = document.getElementById('backButton');
+        const achievementModal = document.getElementById('achievementModal');
+        const achievementTitle = document.getElementById('achievementTitle');
+        const achievementDescription = document.getElementById('achievementDescription');
+        const achievementClose = document.getElementById('achievementClose');
+        
+        // 初始化花园
+        function initGarden() {
+            for (let i = 0; i < gardenSize; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('garden-cell');
+                cell.dataset.index = i;
+                cell.addEventListener('click', handleCellClick);
+                gardenGrid.appendChild(cell);
+            }
+        }
+        
+        // 处理单元格点击
+        function handleCellClick(event) {
+            const cell = event.currentTarget;
+            
+            switch (currentTool) {
+                case 'plantFlower':
+                    if (!cell.classList.contains('planted')) {
+                        plantFlower(cell);
+                    }
+                    break;
+                case 'waterFlower':
+                    if (cell.classList.contains('planted')) {
+                        waterFlower(cell);
+                    }
+                    break;
+                case 'fertilizeFlower':
+                    if (cell.classList.contains('planted')) {
+                        fertilizeFlower(cell);
+                    }
+                    break;
+                case 'removeFlower':
+                    if (cell.classList.contains('planted')) {
+                        removeFlower(cell);
+                    }
+                    break;
+            }
+        }
+        
+        // 种植花朵
+        function plantFlower(cell) {
+            // 随机选择花朵类型
+            const flowerType = flowerTypes[Math.floor(Math.random() * flowerTypes.length)];
+            
+            // 创建花朵元素
+            const flower = document.createElement('div');
+            flower.classList.add('flower');
+            flower.dataset.type = Math.floor(Math.random() * flowerTypes.length);
+            
+            // 创建花茎
+            const stem = document.createElement('div');
+            stem.classList.add('flower-stem');
+            stem.style.backgroundColor = flowerType.stemColor;
+            
+            // 创建花芯
+            const core = document.createElement('div');
+            core.classList.add('flower-core');
+            core.style.backgroundColor = flowerType.coreColor;
+            core.style.width = '30%';
+            core.style.height = '30%';
+            
+            // 创建花瓣（6个花瓣）
+            const petals = [];
+            for (let i = 0; i < 6; i++) {
+                const petal = document.createElement('div');
+                petal.classList.add('flower-petal');
+                petal.style.backgroundColor = flowerType.color;
+                
+                // 设置花瓣位置
+                const angle = (i / 6) * Math.PI * 2;
+                const distance = 40; // 距离中心的距离
+                petal.style.transform = `translate(-50%, -50%) rotate(${angle}rad) translateY(-${distance}%)`;
+                
+                petals.push(petal);
+            }
+            
+            // 组装花朵
+            flower.appendChild(stem);
+            flower.appendChild(core);
+            petals.forEach(petal => flower.appendChild(petal));
+            
+            // 添加到单元格
+            cell.appendChild(flower);
+            cell.classList.add('planted');
+            
+            // 更新状态
+            plantedFlowers++;
+            addLovePoints(10);
+            
+            // 创建爱心雨效果
+            createHeartRain(5);
+            
+            // 检查成就
+            checkAchievements();
+        }
+        
+        // 给花朵浇水
+        function waterFlower(cell) {
+            const flower = cell.querySelector('.flower');
+            if (flower) {
+                // 创建水滴动画
+                const waterDrop = document.createElement('div');
+                waterDrop.style.position = 'absolute';
+                waterDrop.style.width = '10px';
+                waterDrop.style.height = '10px';
+                waterDrop.style.backgroundColor = 'rgba(84, 160, 255, 0.6)';
+                waterDrop.style.borderRadius = '50%';
+                waterDrop.style.top = '10%';
+                waterDrop.style.left = `${Math.random() * 80 + 10}%`;
+                waterDrop.style.animation = 'dropWater 1s ease forwards';
+                waterDrop.style.zIndex = '10';
+                cell.appendChild(waterDrop);
+                
+                // 添加水滴动画样式
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes dropWater {
+                        to {
+                            transform: translateY(100px);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                // 更新状态
+                flower.style.transform = 'translate(-50%, -50%) scale(1.1)';
+                setTimeout(() => {
+                    flower.style.transform = 'translate(-50%, -50%) scale(1)';
+                }, 500);
+                
+                addLovePoints(2);
+                
+                // 移除水滴元素
+                setTimeout(() => {
+                    cell.removeChild(waterDrop);
+                    document.head.removeChild(style);
+                }, 1000);
+            }
+        }
+        
+        // 给花朵施肥
+        function fertilizeFlower(cell) {
+            const flower = cell.querySelector('.flower');
+            if (flower) {
+                // 创建生长动画
+                flower.style.transition = 'all 1s ease';
+                flower.style.transform = 'translate(-50%, -50%) scale(1.2)';
+                
+                // 改变花朵颜色（稍微深一点）
+                const petals = flower.querySelectorAll('.flower-petal');
+                const core = flower.querySelector('.flower-core');
+                
+                petals.forEach(petal => {
+                    const currentColor = petal.style.backgroundColor;
+                    petal.style.backgroundColor = darkenColor(currentColor, 10);
+                });
+                
+                core.style.backgroundColor = darkenColor(core.style.backgroundColor, 10);
+                
+                // 更新状态
+                addLovePoints(5);
+                
+                // 恢复原始大小
+                setTimeout(() => {
+                    flower.style.transform = 'translate(-50%, -50%) scale(1)';
+                }, 1000);
+            }
+        }
+        
+        // 移除花朵
+        function removeFlower(cell) {
+            const flower = cell.querySelector('.flower');
+            if (flower) {
+                // 添加淡出动画
+                flower.style.transition = 'all 0.5s ease';
+                flower.style.opacity = '0';
+                flower.style.transform = 'translate(-50%, -50%) scale(0.5)';
+                
+                // 更新状态
+                setTimeout(() => {
+                    cell.removeChild(flower);
+                    cell.classList.remove('planted');
+                    plantedFlowers--;
+                    addLovePoints(-3); // 移除花朵会减少一些爱情指数
+                }, 500);
+            }
+        }
+        
+        // 提交留言
+        function submitMessage() {
+            const message = messageInput.value.trim();
+            if (message) {
+                // 创建留言元素
+                const messageItem = document.createElement('div');
+                messageItem.classList.add('message-item');
+                messageItem.textContent = message;
+                
+                // 添加到留言板
+                messageList.insertBefore(messageItem, messageList.firstChild);
+                
+                // 清空输入框
+                messageInput.value = '';
+                
+                // 更新状态
+                messageCount++;
+                addLovePoints(15);
+                
+                // 创建爱心雨效果
+                createHeartRain(8);
+                
+                // 检查成就
+                checkAchievements();
+            }
+        }
+        
+        // 添加爱情指数
+        function addLovePoints(points) {
+            lovePoints = Math.max(0, lovePoints + points);
+            lovePointsElement.textContent = lovePoints;
+            
+            // 指数变化动画
+            lovePointsElement.style.animation = 'none';
+            void lovePointsElement.offsetWidth; // 触发重绘
+            lovePointsElement.style.animation = 'glow 1.5s ease-in-out infinite alternate';
+        }
+        
+        // 创建爱心雨效果
+        function createHeartRain(count) {
+            for (let i = 0; i < count; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                
+                // 随机大小
+                const size = Math.random() * 20 + 10;
+                heart.style.fontSize = `${size}px`;
+                
+                // 随机位置
+                heart.style.left = `${Math.random() * 100}vw`;
+                
+                // 随机颜色
+                const colors = ['#ff6b81', '#ff9ff3', '#54a0ff', '#5f27cd', '#ffd700'];
+                heart.style.color = colors[Math.floor(Math.random() * colors.length)];
+                
+                // 随机延迟和持续时间
+                const delay = Math.random() * 5;
+                const duration = Math.random() * 10 + 5;
+                heart.style.animationDelay = `${delay}s`;
+                heart.style.animationDuration = `${duration}s`;
+                
+                // 随机旋转
+                heart.style.transform = `rotate(${Math.random() * 360}deg)`;
+                
+                // 爱心符号
+                heart.textContent = '❤️';
+                
+                document.body.appendChild(heart);
+                
+                // 移除元素
+                setTimeout(() => {
+                    document.body.removeChild(heart);
+                }, (delay + duration) * 1000);
+            }
+        }
+        
+        // 检查成就
+        function checkAchievements() {
+            const achievements = [
+                { condition: plantedFlowers >= 5, title: '花园初成', description: '你已经种下了5朵爱情之花！' },
+                { condition: plantedFlowers >= 10, title: '百花齐放', description: '你的花园已经有10朵美丽的花朵了！' },
+                { condition: plantedFlowers >= 15, title: '浪漫花园', description: '你的花园充满了爱的气息！' },
+                { condition: lovePoints >= 100, title: '爱满心田', description: '爱情指数达到100！' },
+                { condition: lovePoints >= 200, title: '浓情蜜意', description: '爱情指数达到200！' },
+                { condition: messageCount >= 3, title: '甜言蜜语', description: '你留下了3条爱的留言！' },
+                { condition: messageCount >= 5, title: '情话绵绵', description: '你留下了5条爱的留言！' },
+                { condition: plantedFlowers >= 20 && lovePoints >= 300, title: '爱情花园大师', description: '你是真正的爱情花园大师！' }
+            ];
+            
+            // 检查是否有新成就解锁
+            for (const achievement of achievements) {
+                // 使用localStorage记录已解锁的成就
+                const achievementKey = `achievement_${achievement.title}`;
+                if (achievement.condition && !localStorage.getItem(achievementKey)) {
+                    // 记录成就
+                    localStorage.setItem(achievementKey, 'true');
+                    
+                    // 显示成就弹窗
+                    showAchievement(achievement.title, achievement.description);
+                    
+                    // 创建庆祝效果
+                    createHeartRain(20);
+                    break; // 一次只显示一个成就
+                }
+            }
+        }
+        
+        // 显示成就弹窗
+        function showAchievement(title, description) {
+            achievementTitle.textContent = title;
+            achievementDescription.textContent = description;
+            achievementModal.style.display = 'block';
+        }
+        
+        // 工具选择处理
+        function handleToolSelection(event) {
+            // 移除所有工具的active状态
+            toolButtons.forEach(button => button.classList.remove('active'));
+            
+            // 添加当前工具的active状态
+            event.currentTarget.classList.add('active');
+            
+            // 更新当前工具
+            currentTool = event.currentTarget.id;
+        }
+        
+        // 辅助函数：加深颜色
+        function darkenColor(color, percent) {
+            // 移除可能的alpha通道
+            color = color.replace(/[\s\)]+$/, '').replace(/rgba?\(/, '').split(',')[0].trim();
+            
+            // 如果是十六进制颜色
+            if (color.charAt(0) === '#') {
+                let num = parseInt(color.slice(1), 16);
+                let amt = Math.round(2.55 * percent);
+                let R = (num >> 16) - amt;
+                let G = (num >> 8 & 0x00FF) - amt;
+                let B = (num & 0x0000FF) - amt;
+                return '#' + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                  (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                  (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+            }
+            return color;
+        }
+        
+        // 事件监听器
+        function initEventListeners() {
+            // 工具选择
+            toolButtons.forEach(button => {
+                button.addEventListener('click', handleToolSelection);
+            });
+            
+            // 默认选择种植工具
+            document.getElementById('plantFlower').classList.add('active');
+            
+            // 提交留言
+            submitMessageButton.addEventListener('click', submitMessage);
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    submitMessage();
+                }
+            });
+            
+            // 返回按钮
+            backButton.addEventListener('click', () => {
+                window.location.href = 'page1.html';
+            });
+            
+            // 关闭成就弹窗
+            achievementClose.addEventListener('click', () => {
+                achievementModal.style.display = 'none';
+            });
+        }
+        
+        // 初始化应用
+        function initApp() {
+            initGarden();
+            initEventListeners();
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

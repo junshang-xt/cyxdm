@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>命运之爱 - 我们的命中注定</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #e8f5e8 0%, #e3f2fd 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* 背景装饰 */
+        .bg-decoration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.2;
+        }
+        
+        .destiny-symbol {
+            position: absolute;
+            font-size: 2rem;
+            animation: float 15s ease-in-out infinite;
+            opacity: 0.6;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-50px) rotate(180deg);
+            }
+        }
+        
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* 标题样式 */
+        .title-section {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 30px;
+        }
+        
+        .main-title {
+            font-size: 3rem;
+            color: #1565c0;
+            text-shadow: 3px 3px 0px rgba(21, 101, 192, 0.2);
+            margin-bottom: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #0d47a1;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* 命运之轮区域 */
+        .destiny-wheel-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            color: #1565c0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 30px;
+            perspective: 1000px;
+        }
+        
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1976d2, #2196f3, #64b5f6, #90caf9);
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .wheel-section {
+            position: absolute;
+            width: 100%;
+            height: 50%;
+            transform-origin: bottom;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            clip-path: polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%);
+        }
+        
+        .wheel-arrow {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 30px solid #ff6b81;
+            z-index: 10;
+        }
+        
+        .spin-button {
+            background: linear-gradient(45deg, #ff6b81, #ff8e53);
+            border: none;
+            border-radius: 50px;
+            padding: 15px 40px;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .spin-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .spin-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .wheel-result {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #1565c0;
+            font-weight: bold;
+            min-height: 30px;
+        }
+        
+        /* 缘分测试区域 */
+        .compatibility-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .test-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 1.1rem;
+            color: #0d47a1;
+            margin-bottom: 10px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #1976d2;
+        }
+        
+        .calculate-button {
+            background: linear-gradient(45deg, #1976d2, #2196f3);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .calculate-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .compatibility-result {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #e8f5e8 100%);
+            border-radius: 15px;
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .compatibility-score {
+            font-size: 3rem;
+            color: #1565c0;
+            font-weight: bold;
+            margin-bottom: 15px;
+            animation: scoreAppear 1s ease-out;
+        }
+        
+        @keyframes scoreAppear {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .compatibility-message {
+            font-size: 1.2rem;
+            color: #0d47a1;
+            line-height: 1.6;
+        }
+        
+        /* 爱情誓言区域 */
+        .vows-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .vow-generator {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .generate-vow-button {
+            background: linear-gradient(45deg, #4caf50, #81c784);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .generate-vow-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .vow-display {
+            background: linear-gradient(135deg, #fffde7 0%, #fce4ec 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .vow-text {
+            font-size: 1.4rem;
+            color: #1565c0;
+            line-height: 1.8;
+            text-align: center;
+            animation: vowAppear 1s ease-out;
+        }
+        
+        @keyframes vowAppear {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .save-vow-button {
+            background: linear-gradient(45deg, #ff9800, #ffb74d);
+            border: none;
+            border-radius: 50px;
+            padding: 10px 25px;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .save-vow-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* 命运之桥游戏 */
+        .bridge-game-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .game-instructions {
+            text-align: center;
+            color: #0d47a1;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        
+        .game-container {
+            position: relative;
+            height: 300px;
+            background: linear-gradient(to bottom, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .game-platform {
+            position: absolute;
+            background: linear-gradient(90deg, #795548, #a1887f);
+            border-radius: 5px;
+            transition: left 0.3s ease;
+        }
+        
+        .game-character {
+            position: absolute;
+            width: 30px;
+            height: 40px;
+            background: linear-gradient(135deg, #ff5722, #ff9800);
+            border-radius: 5px;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: bottom 0.5s ease;
+        }
+        
+        .game-target {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #e91e63, #f06292);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .game-button {
+            background: linear-gradient(45deg, #1976d2, #2196f3);
+            border: none;
+            border-radius: 50px;
+            padding: 10px 25px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .game-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .game-status {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.1rem;
+            color: #0d47a1;
+        }
+        
+        /* 返回按钮 */
+        .back-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(45deg, #1976d2, #0d47a1);
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        }
+        
+        /* 浪漫特效 */
+        .heart {
+            position: fixed;
+            top: -10%;
+            transform: translateY(0);
+            animation: fall linear forwards;
+            z-index: 99;
+            pointer-events: none;
+        }
+        
+        @keyframes fall {
+            to {
+                transform: translateY(110vh) rotate(720deg);
+            }
+        }
+        
+        .sparkle {
+            position: fixed;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 70%);
+            pointer-events: none;
+            animation: sparkle 1s ease-out forwards;
+            z-index: 100;
+        }
+        
+        @keyframes sparkle {
+            0% {
+                opacity: 1;
+                transform: scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.5);
+            }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .wheel-container {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .wheel-section {
+                font-size: 1rem;
+            }
+            
+            .compatibility-score {
+                font-size: 2.5rem;
+            }
+            
+            .vow-text {
+                font-size: 1.2rem;
+            }
+            
+            .game-container {
+                height: 250px;
+            }
+            
+            .back-button {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-title {
+                font-size: 1.8rem;
+            }
+            
+            .wheel-container {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .wheel-section {
+                font-size: 0.8rem;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .compatibility-score {
+                font-size: 2rem;
+            }
+            
+            .vow-text {
+                font-size: 1.1rem;
+            }
+            
+            .game-container {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景装饰 -->
+    <div class="bg-decoration" id="destinySymbols">
+        <!-- 命运符号将由JavaScript动态生成 -->
+    </div>
+    
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- 标题部分 -->
+        <div class="title-section">
+            <h1 class="main-title">命运之爱</h1>
+            <p class="subtitle">命中注定，我们相遇在此刻</p>
+        </div>
+        
+        <!-- 命运之轮区域 -->
+        <div class="destiny-wheel-section">
+            <h2 class="section-title">命运之轮</h2>
+            <div class="wheel-container">
+                <div class="wheel" id="destinyWheel">
+                    <!-- 轮子扇形区域将由JavaScript动态生成 -->
+                </div>
+                <div class="wheel-arrow"></div>
+            </div>
+            <button class="spin-button" id="spinButton">转动命运之轮</button>
+            <div class="wheel-result" id="wheelResult">点击按钮转动命运之轮，揭示你的爱情命运</div>
+        </div>
+        
+        <!-- 缘分测试区域 -->
+        <div class="compatibility-section">
+            <h2 class="section-title">缘分测试</h2>
+            <form class="test-form" id="compatibilityTest">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="yourName">你的名字</label>
+                        <input type="text" class="form-input" id="yourName" placeholder="请输入你的名字" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="partnerName">TA的名字</label>
+                        <input type="text" class="form-input" id="partnerName" placeholder="请输入TA的名字" required>
+                    </div>
+                </div>
+                <button type="submit" class="calculate-button">计算缘分指数</button>
+            </form>
+            <div class="compatibility-result" id="compatibilityResult">
+                <div class="compatibility-score" id="compatibilityScore">0%</div>
+                <div class="compatibility-message" id="compatibilityMessage"></div>
+            </div>
+        </div>
+        
+        <!-- 爱情誓言区域 -->
+        <div class="vows-section">
+            <h2 class="section-title">爱情誓言</h2>
+            <div class="vow-generator">
+                <button class="generate-vow-button" id="generateVowButton">生成专属誓言</button>
+                <div class="vow-display" id="vowDisplay">
+                    <div class="vow-text" id="vowText">点击上方按钮，生成专属于你们的爱情誓言...</div>
+                </div>
+                <button class="save-vow-button" id="saveVowButton" style="display: none;">保存誓言</button>
+            </div>
+        </div>
+        
+        <!-- 命运之桥游戏 -->
+        <div class="bridge-game-section">
+            <h2 class="section-title">命运之桥</h2>
+            <p class="game-instructions">帮助角色跨越命运之桥，到达爱情的彼岸！</p>
+            <div class="game-container" id="gameContainer">
+                <div class="game-character" id="gameCharacter"></div>
+                <!-- 游戏平台和目标将由JavaScript动态生成 -->
+            </div>
+            <div class="game-controls">
+                <button class="game-button" id="startGameButton">开始游戏</button>
+                <button class="game-button" id="jumpButton" disabled>跳跃</button>
+                <button class="game-button" id="resetGameButton" disabled>重置游戏</button>
+            </div>
+            <div class="game-status" id="gameStatus">准备开始游戏...</div>
+        </div>
+    </div>
+    
+    <!-- 返回按钮 -->
+    <button class="back-button" id="backButton">↩</button>
+    
+    <script>
+        // 全局变量
+        let isSpinning = false;
+        let gameStarted = false;
+        let gameJumping = false;
+        let gamePlatforms = [];
+        let gameTarget = null;
+        let compatibilityTested = false;
+        
+        // 命运之轮结果
+        const wheelResults = [
+            "相识是缘",
+            "相知是福",
+            "相恋是命",
+            "相爱是幸",
+            "相惜是真",
+            "相伴是诺",
+            "相濡以沫",
+            "白头偕老"
+        ];
+        
+        // 爱情誓言模板
+        const vowTemplates = [
+            "在茫茫人海中，遇见你是我最大的幸运。愿我们的爱情如同繁星，永远闪耀在彼此的生命中。",
+            "从相遇的那一刻起，我就知道你是我今生的唯一。不管风雨如何，我都会牵着你的手，一起走过人生的每一段旅程。",
+            "爱情不是轰轰烈烈的誓言，而是平平淡淡的陪伴。愿我们在平凡的日子里，感受彼此的温暖，共同创造美好的回忆。",
+            "你是我生命中最美的风景，是我心灵深处最柔软的角落。我爱你，不仅是今天，而是余生的每一天。",
+            "感谢命运让我们相遇，感谢你走进我的世界。愿我们的爱情如同美酒，越陈越香，永远保持最初的美好。",
+            "在这漫长的人生旅途中，有你的陪伴，再苦再累也觉得甜蜜。我会用我的一生，去爱你，保护你，珍惜你。",
+            "爱情是相互包容，相互理解，相互扶持。愿我们在未来的日子里，共同成长，共同进步，一起创造属于我们的幸福。",
+            "你是我生命中的阳光，照亮了我的整个世界。我爱你，直到永远。"
+        ];
+        
+        // DOM 元素
+        const destinyWheel = document.getElementById('destinyWheel');
+        const spinButton = document.getElementById('spinButton');
+        const wheelResult = document.getElementById('wheelResult');
+        const compatibilityTest = document.getElementById('compatibilityTest');
+        const yourName = document.getElementById('yourName');
+        const partnerName = document.getElementById('partnerName');
+        const compatibilityResult = document.getElementById('compatibilityResult');
+        const compatibilityScore = document.getElementById('compatibilityScore');
+        const compatibilityMessage = document.getElementById('compatibilityMessage');
+        const generateVowButton = document.getElementById('generateVowButton');
+        const vowDisplay = document.getElementById('vowDisplay');
+        const vowText = document.getElementById('vowText');
+        const saveVowButton = document.getElementById('saveVowButton');
+        const gameContainer = document.getElementById('gameContainer');
+        const gameCharacter = document.getElementById('gameCharacter');
+        const startGameButton = document.getElementById('startGameButton');
+        const jumpButton = document.getElementById('jumpButton');
+        const resetGameButton = document.getElementById('resetGameButton');
+        const gameStatus = document.getElementById('gameStatus');
+        const backButton = document.getElementById('backButton');
+        const destinySymbols = document.getElementById('destinySymbols');
+        
+        // 初始化命运之轮
+        function initDestinyWheel() {
+            const sectionCount = wheelResults.length;
+            const anglePerSection = 360 / sectionCount;
+            
+            for (let i = 0; i < sectionCount; i++) {
+                const section = document.createElement('div');
+                section.classList.add('wheel-section');
+                section.textContent = wheelResults[i];
+                
+                // 设置角度和背景色
+                const angle = i * anglePerSection;
+                section.style.transform = `rotate(${angle}deg) skewY(${(90 - anglePerSection)}deg)`;
+                
+                // 交替颜色
+                const hue = 210 + (i * 30); // 从蓝色开始
+                const saturation = 70 + (i % 2) * 20;
+                section.style.background = `hsl(${hue}, ${saturation}%, ${45 + (i % 3) * 10}%)`;
+                
+                destinyWheel.appendChild(section);
+            }
+        }
+        
+        // 旋转命运之轮
+        function spinWheel() {
+            if (isSpinning) return;
+            
+            isSpinning = true;
+            spinButton.disabled = true;
+            wheelResult.textContent = "命运之轮正在转动...";
+            
+            // 随机旋转角度（5-10圈加上随机位置）
+            const randomSpins = Math.floor(Math.random() * 6) + 5;
+            const targetIndex = Math.floor(Math.random() * wheelResults.length);
+            const anglePerSection = 360 / wheelResults.length;
+            const targetAngle = (randomSpins * 360) + (targetIndex * anglePerSection);
+            
+            // 应用旋转
+            destinyWheel.style.transform = `rotate(${targetAngle}deg)`;
+            
+            // 旋转完成后显示结果
+            setTimeout(() => {
+                isSpinning = false;
+                spinButton.disabled = false;
+                wheelResult.textContent = `你们的命运是：${wheelResults[targetIndex]}`;
+                
+                // 创建爱心雨效果
+                createHeartRain(10);
+                
+                // 创建闪光效果
+                createSparkle(event.clientX, event.clientY);
+            }, 3000);
+        }
+        
+        // 计算缘分指数
+        function calculateCompatibility(event) {
+            event.preventDefault();
+            
+            const your = yourName.value.trim();
+            const partner = partnerName.value.trim();
+            
+            if (!your || !partner) return;
+            
+            // 使用名字的字符码计算缘分指数
+            let sum = 0;
+            for (let i = 0; i < your.length; i++) {
+                sum += your.charCodeAt(i);
+            }
+            for (let i = 0; i < partner.length; i++) {
+                sum += partner.charCodeAt(i);
+            }
+            
+            // 生成70-99之间的缘分指数
+            const score = 70 + (sum % 30);
+            
+            // 显示结果
+            compatibilityScore.textContent = `${score}%`;
+            compatibilityMessage.textContent = getCompatibilityMessage(score);
+            compatibilityResult.style.display = 'block';
+            
+            // 滚动到结果区域
+            compatibilityResult.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // 创建爱心雨效果
+            createHeartRain(15);
+            
+            // 标记为已测试
+            compatibilityTested = true;
+        }
+        
+        // 获取缘分指数对应的消息
+        function getCompatibilityMessage(score) {
+            if (score >= 95) {
+                return "你们简直是天作之合！命中注定要在一起，无论遇到什么困难，你们都会携手度过。";
+            } else if (score >= 85) {
+                return "你们的缘分非常深厚！彼此之间有着强烈的默契和吸引力，是令人羡慕的一对。";
+            } else if (score >= 75) {
+                return "你们的缘分不错！虽然偶尔会有小摩擦，但彼此包容和理解会让你们的感情更加牢固。";
+            } else {
+                return "你们需要更多的时间和耐心去了解彼此。通过共同的努力和经营，你们的感情会越来越好。";
+            }
+        }
+        
+        // 生成爱情誓言
+        function generateVow() {
+            const randomIndex = Math.floor(Math.random() * vowTemplates.length);
+            const vow = vowTemplates[randomIndex];
+            
+            // 如果已经测试过缘分，可以根据名字定制誓言
+            let customizedVow = vow;
+            if (compatibilityTested && yourName.value && partnerName.value) {
+                customizedVow = vow.replace(/你/g, partnerName.value);
+                customizedVow = customizedVow.replace(/我/g, yourName.value);
+            }
+            
+            // 显示誓言
+            vowText.textContent = customizedVow;
+            
+            // 显示保存按钮
+            saveVowButton.style.display = 'inline-block';
+            
+            // 创建爱心雨效果
+            createHeartRain(8);
+        }
+        
+        // 保存爱情誓言
+        function saveVow() {
+            const vow = vowText.textContent;
+            
+            // 创建一个临时文本区域
+            const textArea = document.createElement('textarea');
+            textArea.value = vow;
+            document.body.appendChild(textArea);
+            
+            // 选择并复制文本
+            textArea.select();
+            document.execCommand('copy');
+            
+            // 移除临时文本区域
+            document.body.removeChild(textArea);
+            
+            // 显示保存成功消息
+            alert('誓言已复制到剪贴板，可以分享给你的爱人！');
+            
+            // 创建闪光效果
+            createSparkle(event.clientX, event.clientY);
+        }
+        
+        // 开始游戏
+        function startGame() {
+            if (gameStarted) return;
+            
+            gameStarted = true;
+            startGameButton.disabled = true;
+            jumpButton.disabled = false;
+            resetGameButton.disabled = false;
+            gameStatus.textContent = "游戏开始！帮助角色到达爱心的位置。";
+            
+            // 创建游戏平台
+            createGamePlatforms();
+            
+            // 创建目标
+            createGameTarget();
+            
+            // 开始游戏循环
+            gameLoop();
+        }
+        
+        // 创建游戏平台
+        function createGamePlatforms() {
+            const containerWidth = gameContainer.offsetWidth;
+            const containerHeight = gameContainer.offsetHeight;
+            
+            // 清除现有平台
+            gamePlatforms.forEach(platform => gameContainer.removeChild(platform));
+            gamePlatforms = [];
+            
+            // 创建起始平台
+            const startPlatform = createPlatform(50, containerHeight - 60, 100, 20);
+            gameContainer.appendChild(startPlatform);
+            gamePlatforms.push(startPlatform);
+            
+            // 创建中间平台
+            let lastX = 100;
+            let lastY = containerHeight - 60;
+            
+            for (let i = 0; i < 4; i++) {
+                const width = Math.floor(Math.random() * 40) + 60;
+                const height = 20;
+                const x = lastX + Math.floor(Math.random() * 100) + 80;
+                const y = lastY - Math.floor(Math.random() * 60) - 40;
+                
+                if (x < containerWidth - width && y > 50) {
+                    const platform = createPlatform(x, y, width, height);
+                    gameContainer.appendChild(platform);
+                    gamePlatforms.push(platform);
+                    
+                    lastX = x;
+                    lastY = y;
+                }
+            }
+        }
+        
+        // 创建平台元素
+        function createPlatform(x, y, width, height) {
+            const platform = document.createElement('div');
+            platform.classList.add('game-platform');
+            platform.style.width = `${width}px`;
+            platform.style.height = `${height}px`;
+            platform.style.left = `${x}px`;
+            platform.style.bottom = `${y}px`;
+            
+            return platform;
+        }
+        
+        // 创建游戏目标
+        function createGameTarget() {
+            if (gameTarget) {
+                gameContainer.removeChild(gameTarget);
+            }
+            
+            const containerWidth = gameContainer.offsetWidth;
+            const containerHeight = gameContainer.offsetHeight;
+            
+            // 创建目标
+            gameTarget = document.createElement('div');
+            gameTarget.classList.add('game-target');
+            gameTarget.textContent = '❤️';
+            gameTarget.style.bottom = '30px';
+            gameTarget.style.right = '50px';
+            
+            gameContainer.appendChild(gameTarget);
+        }
+        
+        // 角色跳跃
+        function jump() {
+            if (!gameStarted || gameJumping) return;
+            
+            gameJumping = true;
+            
+            // 记录初始位置
+            const initialBottom = parseInt(gameCharacter.style.bottom) || 20;
+            
+            // 跳跃上升
+            let currentHeight = initialBottom;
+            const jumpInterval = setInterval(() => {
+                currentHeight += 5;
+                gameCharacter.style.bottom = `${currentHeight}px`;
+                
+                // 到达最高点后下落
+                if (currentHeight >= initialBottom + 100) {
+                    clearInterval(jumpInterval);
+                    fall(initialBottom);
+                }
+                
+                // 检查是否落在平台上
+                checkPlatformCollision(currentHeight);
+                
+                // 检查是否到达目标
+                checkTargetCollision();
+            }, 20);
+        }
+        
+        // 角色下落
+        function fall(initialBottom) {
+            const fallInterval = setInterval(() => {
+                let currentBottom = parseInt(gameCharacter.style.bottom) || 20;
+                currentBottom -= 3;
+                gameCharacter.style.bottom = `${currentBottom}px`;
+                
+                // 检查是否落在平台上
+                if (checkPlatformCollision(currentBottom)) {
+                    clearInterval(fallInterval);
+                    gameJumping = false;
+                    return;
+                }
+                
+                // 检查是否到达目标
+                checkTargetCollision();
+                
+                // 检查是否落地（游戏失败）
+                if (currentBottom <= 0) {
+                    clearInterval(fallInterval);
+                    gameJumping = false;
+                    gameOver();
+                }
+            }, 15);
+        }
+        
+        // 检查平台碰撞
+        function checkPlatformCollision(characterBottom) {
+            const characterRect = gameCharacter.getBoundingClientRect();
+            
+            for (const platform of gamePlatforms) {
+                const platformRect = platform.getBoundingClientRect();
+                
+                // 简单的碰撞检测
+                if (characterRect.right > platformRect.left + 10 && 
+                    characterRect.left < platformRect.right - 10 && 
+                    Math.abs(characterBottom - (gameContainer.offsetHeight - platformRect.top)) < 10) {
+                    
+                    // 落在平台上
+                    gameCharacter.style.bottom = `${gameContainer.offsetHeight - platformRect.top}px`;
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
+        // 检查目标碰撞
+        function checkTargetCollision() {
+            if (!gameTarget) return;
+            
+            const characterRect = gameCharacter.getBoundingClientRect();
+            const targetRect = gameTarget.getBoundingClientRect();
+            
+            // 简单的碰撞检测
+            if (characterRect.right > targetRect.left && 
+                characterRect.left < targetRect.right && 
+                characterRect.bottom > targetRect.top && 
+                characterRect.top < targetRect.bottom) {
+                
+                // 游戏胜利
+                gameWin();
+            }
+        }
+        
+        // 游戏主循环
+        function gameLoop() {
+            if (!gameStarted) return;
+            
+            // 缓慢移动平台（创造动态效果）
+            gamePlatforms.forEach(platform => {
+                const currentLeft = parseInt(platform.style.left);
+                const newLeft = currentLeft - 1;
+                
+                if (newLeft < -platform.offsetWidth) {
+                    // 平台移出屏幕，重新放置到右侧
+                    platform.style.left = `${gameContainer.offsetWidth}px`;
+                } else {
+                    platform.style.left = `${newLeft}px`;
+                }
+            });
+            
+            // 继续游戏循环
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // 游戏胜利
+        function gameWin() {
+            gameStarted = false;
+            jumpButton.disabled = true;
+            gameStatus.textContent = "恭喜你！成功到达爱情的彼岸！";
+            
+            // 创建爱心雨效果
+            createHeartRain(30);
+            
+            // 显示庆祝消息
+            alert('恭喜！你们的爱情跨越了命运之桥，注定要在一起！');
+        }
+        
+        // 游戏失败
+        function gameOver() {
+            gameStarted = false;
+            jumpButton.disabled = true;
+            gameStatus.textContent = "游戏失败！再试一次吧。";
+        }
+        
+        // 重置游戏
+        function resetGame() {
+            gameStarted = false;
+            gameJumping = false;
+            
+            // 重置角色位置
+            gameCharacter.style.bottom = '20px';
+            
+            // 重置按钮状态
+            startGameButton.disabled = false;
+            jumpButton.disabled = true;
+            resetGameButton.disabled = true;
+            
+            // 重置状态消息
+            gameStatus.textContent = "准备开始游戏...";
+            
+            // 清除游戏元素
+            gamePlatforms.forEach(platform => gameContainer.removeChild(platform));
+            gamePlatforms = [];
+            
+            if (gameTarget) {
+                gameContainer.removeChild(gameTarget);
+                gameTarget = null;
+            }
+        }
+        
+        // 创建爱心雨效果
+        function createHeartRain(count) {
+            for (let i = 0; i < count; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                
+                // 随机大小
+                const size = Math.random() * 20 + 10;
+                heart.style.fontSize = `${size}px`;
+                
+                // 随机位置
+                heart.style.left = `${Math.random() * 100}vw`;
+                
+                // 随机颜色
+                const colors = ['#1976d2', '#ff6b81', '#4caf50', '#ff9800', '#9c27b0'];
+                heart.style.color = colors[Math.floor(Math.random() * colors.length)];
+                
+                // 随机延迟和持续时间
+                const delay = Math.random() * 5;
+                const duration = Math.random() * 10 + 5;
+                heart.style.animationDelay = `${delay}s`;
+                heart.style.animationDuration = `${duration}s`;
+                
+                // 爱心符号
+                heart.textContent = '❤️';
+                
+                document.body.appendChild(heart);
+                
+                // 移除元素
+                setTimeout(() => {
+                    document.body.removeChild(heart);
+                }, (delay + duration) * 1000);
+            }
+        }
+        
+        // 创建闪光效果
+        function createSparkle(x, y) {
+            const sparkle = document.createElement('div');
+            sparkle.classList.add('sparkle');
+            
+            // 设置大小和位置
+            const size = Math.random() * 100 + 50;
+            sparkle.style.width = `${size}px`;
+            sparkle.style.height = `${size}px`;
+            sparkle.style.left = `${x - size / 2}px`;
+            sparkle.style.top = `${y - size / 2}px`;
+            
+            document.body.appendChild(sparkle);
+            
+            // 移除元素
+            setTimeout(() => {
+                document.body.removeChild(sparkle);
+            }, 1000);
+        }
+        
+        // 创建命运符号背景
+        function createDestinySymbols() {
+            const symbols = ['✨', '💫', '🌟', '⭐', '💖', '❤️'];
+            
+            for (let i = 0; i < 20; i++) {
+                const symbol = document.createElement('div');
+                symbol.classList.add('destiny-symbol');
+                symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                
+                // 随机位置
+                symbol.style.left = `${Math.random() * 100}vw`;
+                symbol.style.top = `${Math.random() * 100}vh`;
+                
+                // 随机延迟和持续时间
+                symbol.style.animationDelay = `${Math.random() * 10}s`;
+                symbol.style.animationDuration = `${Math.random() * 20 + 15}s`;
+                
+                destinySymbols.appendChild(symbol);
+            }
+        }
+        
+        // 初始化事件监听器
+        function initEventListeners() {
+            // 命运之轮
+            spinButton.addEventListener('click', spinWheel);
+            
+            // 缘分测试
+            compatibilityTest.addEventListener('submit', calculateCompatibility);
+            
+            // 爱情誓言
+            generateVowButton.addEventListener('click', generateVow);
+            saveVowButton.addEventListener('click', saveVow);
+            
+            // 命运之桥游戏
+            startGameButton.addEventListener('click', startGame);
+            jumpButton.addEventListener('click', jump);
+            resetGameButton.addEventListener('click', resetGame);
+            
+            // 返回按钮
+            backButton.addEventListener('click', () => {
+                window.location.href = 'page1.html';
+            });
+            
+            // 键盘控制游戏
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'Space') {
+                    jump();
+                }
+            });
+        }
+        
+        // 初始化应用
+        function initApp() {
+            initDestinyWheel();
+            initEventListeners();
+            createDestinySymbols();
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

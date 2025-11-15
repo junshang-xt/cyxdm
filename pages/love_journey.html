@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱的旅程 - 与你同行的每一步</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        /* 全局样式 */
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            background-attachment: fixed;
+        }
+        
+        /* 页面容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 标题样式 */
+        h1 {
+            text-align: center;
+            color: #fff;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        h1::after {
+            content: '✈️';
+            position: absolute;
+            right: -40px;
+            top: -10px;
+            animation: fly 3s ease-in-out infinite;
+        }
+        
+        @keyframes fly {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            50% { transform: translateX(-10px) translateY(-10px); }
+        }
+        
+        h1::before {
+            content: '🚗';
+            position: absolute;
+            left: -40px;
+            top: -10px;
+            animation: drive 3s ease-in-out infinite;
+        }
+        
+        @keyframes drive {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            50% { transform: translateX(10px) translateY(-5px); }
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+        }
+        
+        /* 装饰元素 */
+        .decoration {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.6;
+        }
+        
+        .cloud {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 40px;
+            animation: floatCloud 30s linear infinite;
+        }
+        
+        @keyframes floatCloud {
+            0% { transform: translateX(-100px); }
+            100% { transform: translateX(calc(100vw + 100px)); }
+        }
+        
+        .road {
+            position: absolute;
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(90deg, #666 50%, transparent 50%);
+            background-size: 20px 10px;
+            bottom: 0;
+            left: 0;
+            transform: translateY(20px);
+            animation: moveRoad 0.5s linear infinite;
+        }
+        
+        @keyframes moveRoad {
+            0% { background-position: 0 0; }
+            100% { background-position: 20px 0; }
+        }
+        
+        /* 旅行进度统计 */
+        .travel-stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-item {
+            text-align: center;
+            margin: 10px;
+            min-width: 120px;
+        }
+        
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        /* 地图容器 */
+        .map-container {
+            position: relative;
+            margin: 40px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            overflow: hidden;
+        }
+        
+        .map-container h2 {
+            text-align: center;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+        }
+        
+        .map {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: url('https://images.unsplash.com/photo-1515963002437-94d85e41e6f0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .map-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(168, 237, 234, 0.2), rgba(254, 214, 227, 0.3));
+        }
+        
+        /* 地图上的点 */
+        .map-point {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ff6b6b;
+            border: 3px solid white;
+            border-radius: 50%;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .map-point:hover {
+            transform: translate(-50%, -50%) scale(1.3);
+        }
+        
+        .map-point.visited {
+            background: #4ecdc4;
+        }
+        
+        .map-point.current {
+            animation: pulseLocation 2s ease-in-out infinite;
+            background: #ff6b6b;
+        }
+        
+        @keyframes pulseLocation {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(255, 107, 107, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
+            }
+        }
+        
+        .point-label {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .map-point:hover .point-label {
+            opacity: 1;
+        }
+        
+        /* 连接线 */
+        .map-line {
+            position: absolute;
+            background: #ff6b6b;
+            height: 3px;
+            transform-origin: 0 0;
+            z-index: 1;
+        }
+        
+        /* 旅行里程碑 */
+        .milestones {
+            margin: 40px 0;
+        }
+        
+        .milestones h2 {
+            text-align: center;
+            color: #ff6b6b;
+            margin-bottom: 30px;
+        }
+        
+        .milestone-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .milestone-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .milestone-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .milestone-image {
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+        }
+        
+        .milestone-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .milestone-card:hover .milestone-image img {
+            transform: scale(1.1);
+        }
+        
+        .milestone-content {
+            padding: 20px;
+        }
+        
+        .milestone-content h3 {
+            margin-top: 0;
+            color: #ff6b6b;
+        }
+        
+        .milestone-date {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        
+        .milestone-description {
+            color: #666;
+        }
+        
+        /* 下一站按钮 */
+        .next-destination-btn {
+            display: block;
+            margin: 40px auto;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #ff6b6b, #ff9e9e);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 12px rgba(255, 107, 107, 0.4);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .next-destination-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.6);
+        }
+        
+        .next-destination-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .next-destination-btn:hover::before {
+            left: 100%;
+        }
+        
+        /* 挑战任务 */
+        .challenges {
+            margin: 40px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .challenges h2 {
+            text-align: center;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+        }
+        
+        .challenge-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .challenge-item {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #ff6b6b;
+            transition: transform 0.3s ease;
+        }
+        
+        .challenge-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .challenge-item.Completed {
+            border-left-color: #4ecdc4;
+            opacity: 0.8;
+        }
+        
+        .challenge-item h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        
+        .challenge-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-top: 10px;
+        }
+        
+        .challenge-status.Pending {
+            background: #ffecec;
+            color: #ff6b6b;
+        }
+        
+        .challenge-status.Completed {
+            background: #e6f9f7;
+            color: #4ecdc4;
+        }
+        
+        .complete-challenge-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s ease;
+        }
+        
+        .complete-challenge-btn:hover {
+            background: #ff5252;
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.4s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.3s ease;
+        }
+        
+        .close-btn:hover {
+            color: #ff6b6b;
+        }
+        
+        /* 庆祝效果 */
+        .celebration {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 9999;
+            overflow: hidden;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ff6b6b;
+            opacity: 0;
+            animation: fallConfetti linear;
+        }
+        
+        @keyframes fallConfetti {
+            0% {
+                transform: translateY(-50px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* 加载动画 */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .loader-animation {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .loader-dot {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            animation: loaderBounce 1.4s infinite ease-in-out both;
+        }
+        
+        .loader-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+        
+        .loader-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+        
+        @keyframes loaderBounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h1::before,
+            h1::after {
+                display: none;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .travel-stats {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stat-item {
+                width: 100%;
+                max-width: 200px;
+            }
+            
+            .map {
+                height: 300px;
+            }
+            
+            .milestone-list,
+            .challenge-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .next-destination-btn {
+                width: 90%;
+                padding: 12px 20px;
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .map {
+                height: 250px;
+            }
+            
+            .milestone-content,
+            .challenge-item {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 加载动画 -->
+    <div class="loader" id="loader">
+        <div class="loader-animation">
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+        </div>
+    </div>
+    
+    <!-- 装饰元素 -->
+    <div class="decoration" id="decoration"></div>
+    <div class="road"></div>
+    
+    <!-- 庆祝效果 -->
+    <div class="celebration" id="celebration"></div>
+    
+    <div class="container">
+        <h1>爱的旅程</h1>
+        <p class="subtitle">与你同行的每一步，都是最美的风景</p>
+        
+        <!-- 旅行统计 -->
+        <div class="travel-stats">
+            <div class="stat-item">
+                <div class="stat-icon">📍</div>
+                <div class="stat-value" id="places-count">5</div>
+                <div class="stat-label">已探索地点</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">📸</div>
+                <div class="stat-value" id="photos-count">128</div>
+                <div class="stat-label">美好瞬间</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">💑</div>
+                <div class="stat-value" id="days-count">248</div>
+                <div class="stat-label">相伴天数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">🏆</div>
+                <div class="stat-value" id="challenges-count">3</div>
+                <div class="stat-label">已完成挑战</div>
+            </div>
+        </div>
+        
+        <!-- 旅行地图 -->
+        <div class="map-container">
+            <h2>我们的旅行地图</h2>
+            <div class="map" id="map">
+                <div class="map-overlay"></div>
+                
+                <!-- 地图点 -->
+                <div class="map-point visited" style="top: 20%; left: 30%;">
+                    <div class="point-label">初次相遇</div>
+                </div>
+                <div class="map-point visited" style="top: 40%; left: 45%;">
+                    <div class="point-label">第一次约会</div>
+                </div>
+                <div class="map-point visited" style="top: 60%; left: 25%;">
+                    <div class="point-label">海边漫步</div>
+                </div>
+                <div class="map-point visited" style="top: 30%; left: 70%;">
+                    <div class="point-label">山顶日出</div>
+                </div>
+                <div class="map-point current" style="top: 50%; left: 60%;">
+                    <div class="point-label">甜蜜时光</div>
+                </div>
+                <div class="map-point" style="top: 70%; left: 80%;">
+                    <div class="point-label">未来计划</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 旅行里程碑 -->
+        <div class="milestones">
+            <h2>珍贵的里程碑</h2>
+            <div class="milestone-list" id="milestone-list">
+                <div class="milestone-card" onclick="openMilestoneModal(0)">
+                    <div class="milestone-image">
+                        <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="初次相遇">
+                    </div>
+                    <div class="milestone-content">
+                        <h3>初次相遇</h3>
+                        <div class="milestone-date">2024年2月14日</div>
+                        <div class="milestone-description">那一天，我们在咖啡馆偶然相遇，命运的齿轮开始转动...</div>
+                    </div>
+                </div>
+                <div class="milestone-card" onclick="openMilestoneModal(1)">
+                    <div class="milestone-image">
+                        <img src="https://images.unsplash.com/photo-1504006833117-8886a355efbf?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="第一次约会">
+                    </div>
+                    <div class="milestone-content">
+                        <h3>第一次约会</h3>
+                        <div class="milestone-date">2024年2月20日</div>
+                        <div class="milestone-description">我们一起看电影、吃晚餐，度过了美好的时光...</div>
+                    </div>
+                </div>
+                <div class="milestone-card" onclick="openMilestoneModal(2)">
+                    <div class="milestone-image">
+                        <img src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="海边漫步">
+                    </div>
+                    <div class="milestone-content">
+                        <h3>海边漫步</h3>
+                        <div class="milestone-date">2024年3月15日</div>
+                        <div class="milestone-description">我们一起去看海，听着海浪的声音，许下了美好的约定...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 下一站按钮 -->
+        <button class="next-destination-btn" id="next-destination-btn">前往下一站</button>
+        
+        <!-- 挑战任务 -->
+        <div class="challenges">
+            <h2>爱的挑战</h2>
+            <div class="challenge-list" id="challenge-list">
+                <div class="challenge-item" id="challenge-1">
+                    <h3>一起做晚餐</h3>
+                    <p>共同准备一顿浪漫的烛光晚餐，体验烹饪的乐趣。</p>
+                    <span class="challenge-status Pending">待完成</span>
+                    <button class="complete-challenge-btn" onclick="completeChallenge(1)">完成挑战</button>
+                </div>
+                <div class="challenge-item Completed" id="challenge-2">
+                    <h3>一起看日出</h3>
+                    <p>早起一次，一起欣赏美丽的日出，感受新的一天开始。</p>
+                    <span class="challenge-status Completed">已完成</span>
+                </div>
+                <div class="challenge-item" id="challenge-3">
+                    <h3>写一封情书</h3>
+                    <p>用心写下对彼此的感情，表达内心深处的爱意。</p>
+                    <span class="challenge-status Pending">待完成</span>
+                    <button class="complete-challenge-btn" onclick="completeChallenge(3)">完成挑战</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 里程碑详情模态框 -->
+    <div class="modal" id="milestone-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeMilestoneModal()">&times;</span>
+            <h2 id="modal-title">里程碑详情</h2>
+            <div id="modal-content">
+                <!-- 模态框内容将通过JavaScript动态填充 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 下一站模态框 -->
+    <div class="modal" id="next-destination-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeNextDestinationModal()">&times;</span>
+            <h2>选择下一个目的地</h2>
+            <div class="destination-options">
+                <div class="destination-option" onclick="selectDestination('雪山之旅')">
+                    <h3>🏔️ 雪山之旅</h3>
+                    <p>一起去看雪山，感受大自然的壮丽。</p>
+                </div>
+                <div class="destination-option" onclick="selectDestination('城市探险')">
+                    <h3>🏙️ 城市探险</h3>
+                    <p>探索新的城市，发现惊喜和浪漫。</p>
+                </div>
+                <div class="destination-option" onclick="selectDestination('乡村度假')">
+                    <h3>🏡 乡村度假</h3>
+                    <p>远离城市喧嚣，享受宁静的乡村时光。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 里程碑数据
+        const milestones = [
+            {
+                title: "初次相遇",
+                date: "2024年2月14日",
+                description: "那一天，我们在咖啡馆偶然相遇，命运的齿轮开始转动。你不经意的微笑，让我的心泛起涟漪。我们聊了很久，仿佛认识了很久的朋友。从那一刻起，我知道你是特别的。",
+                image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                highlights: ["第一次眼神接触", "聊了整整3个小时", "交换了联系方式"]
+            },
+            {
+                title: "第一次约会",
+                date: "2024年2月20日",
+                description: "我们一起看了一场浪漫的电影，然后去了一家温馨的餐厅吃晚餐。整个晚上，我们有说不完的话题。当我送你回家时，我们都不舍得分开，约定了下一次见面。",
+                image: "https://images.unsplash.com/photo-1504006833117-8886a355efbf?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                highlights: ["看了爱情电影", "共进烛光晚餐", "第一次牵手"]
+            },
+            {
+                title: "海边漫步",
+                date: "2024年3月15日",
+                description: "我们一起去看海，听着海浪的声音，感受着海风的轻抚。我们在沙滩上留下了脚印，写下了彼此的名字。夕阳西下，我们相拥着看日落，那一刻，时间仿佛静止了。",
+                image: "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                highlights: ["海边日出", "沙滩漫步", "许下约定"]
+            }
+        ];
+        
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 隐藏加载动画
+            setTimeout(function() {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1500);
+            
+            // 创建装饰性云朵
+            createDecorativeClouds();
+            
+            // 绘制地图连接线
+            drawMapLines();
+            
+            // 添加按钮事件监听
+            document.getElementById('next-destination-btn').addEventListener('click', function() {
+                document.getElementById('next-destination-modal').style.display = 'flex';
+            });
+        });
+        
+        // 创建装饰性云朵
+        function createDecorativeClouds() {
+            const decoration = document.getElementById('decoration');
+            const cloudEmojis = ['☁️', '🌤️', '⛅'];
+            const cloudCount = 5;
+            
+            for (let i = 0; i < cloudCount; i++) {
+                const cloud = document.createElement('div');
+                cloud.className = 'cloud';
+                cloud.textContent = cloudEmojis[Math.floor(Math.random() * cloudEmojis.length)];
+                
+                // 随机位置和动画
+                cloud.style.top = Math.random() * 40 + '%';
+                cloud.style.animationDuration = Math.random() * 60 + 40 + 's';
+                cloud.style.animationDelay = Math.random() * 10 + 's';
+                cloud.style.fontSize = Math.random() * 40 + 30 + 'px';
+                
+                decoration.appendChild(cloud);
+            }
+        }
+        
+        // 绘制地图连接线
+        function drawMapLines() {
+            const map = document.getElementById('map');
+            const points = map.querySelectorAll('.map-point');
+            
+            for (let i = 0; i < points.length - 1; i++) {
+                // 只连接已访问的点
+                if (!points[i].classList.contains('visited')) break;
+                
+                const point1 = points[i].getBoundingClientRect();
+                const point2 = points[i + 1].getBoundingClientRect();
+                const mapRect = map.getBoundingClientRect();
+                
+                // 计算相对坐标
+                const x1 = point1.left + point1.width/2 - mapRect.left;
+                const y1 = point1.top + point1.height/2 - mapRect.top;
+                const x2 = point2.left + point2.width/2 - mapRect.left;
+                const y2 = point2.top + point2.height/2 - mapRect.top;
+                
+                // 计算线的长度和角度
+                const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+                const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+                
+                // 创建线元素
+                const line = document.createElement('div');
+                line.className = 'map-line';
+                line.style.width = length + 'px';
+                line.style.height = '3px';
+                line.style.left = x1 + 'px';
+                line.style.top = y1 + 'px';
+                line.style.transform = 'rotate(' + angle + 'deg)';
+                
+                // 如果下一个点未访问，使用虚线
+                if (!points[i + 1].classList.contains('visited') && !points[i + 1].classList.contains('current')) {
+                    line.style.background = 'none';
+                    line.style.borderTop = '3px dashed #ff6b6b';
+                }
+                
+                map.appendChild(line);
+            }
+        }
+        
+        // 打开里程碑模态框
+        function openMilestoneModal(index) {
+            const milestone = milestones[index];
+            const modal = document.getElementById('milestone-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content');
+            
+            modalTitle.textContent = milestone.title;
+            
+            // 构建模态框内容
+            let contentHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="${milestone.image}" style="width: 100%; border-radius: 8px; margin-bottom: 15px;">
+                    <div style="color: #666; font-size: 0.9rem;">${milestone.date}</div>
+                </div>
+                <p style="line-height: 1.6;">${milestone.description}</p>
+                <h4 style="margin-top: 20px; color: #ff6b6b;">精彩瞬间</h4>
+                <ul style="list-style-type: none; padding: 0;">
+            `;
+            
+            milestone.highlights.forEach(highlight => {
+                contentHTML += `<li style="background: #fff3f3; padding: 8px 12px; margin-bottom: 8px; border-radius: 5px;">✨ ${highlight}</li>`;
+            });
+            
+            contentHTML += `</ul>`;
+            modalContent.innerHTML = contentHTML;
+            modal.style.display = 'flex';
+        }
+        
+        // 关闭里程碑模态框
+        function closeMilestoneModal() {
+            document.getElementById('milestone-modal').style.display = 'none';
+        }
+        
+        // 关闭下一站模态框
+        function closeNextDestinationModal() {
+            document.getElementById('next-destination-modal').style.display = 'none';
+        }
+        
+        // 选择目的地
+        function selectDestination(destination) {
+            const modal = document.getElementById('next-destination-modal');
+            modal.style.display = 'none';
+            
+            // 显示庆祝效果
+            createCelebration();
+            
+            // 更新地图
+            updateMapForNewDestination(destination);
+        }
+        
+        // 更新地图新目的地
+        function updateMapForNewDestination(destination) {
+            const map = document.getElementById('map');
+            const points = map.querySelectorAll('.map-point');
+            
+            // 找到下一个未访问的点
+            for (let i = 0; i < points.length; i++) {
+                if (!points[i].classList.contains('visited') && !points[i].classList.contains('current')) {
+                    // 更新当前点和下一个点的状态
+                    const currentPoint = map.querySelector('.map-point.current');
+                    if (currentPoint) {
+                        currentPoint.classList.remove('current');
+                        currentPoint.classList.add('visited');
+                    }
+                    
+                    points[i].classList.remove('visited');
+                    points[i].classList.add('current');
+                    points[i].querySelector('.point-label').textContent = destination;
+                    
+                    // 更新计数
+                    const placesCount = document.getElementById('places-count');
+                    placesCount.textContent = parseInt(placesCount.textContent) + 1;
+                    
+                    // 重绘地图连接线
+                    const lines = map.querySelectorAll('.map-line');
+                    lines.forEach(line => line.remove());
+                    drawMapLines();
+                    
+                    break;
+                }
+            }
+            
+            // 显示消息
+            alert(`我们的下一站是: ${destination}！让我们一起创造新的美好回忆吧！`);
+        }
+        
+        // 完成挑战
+        function completeChallenge(challengeId) {
+            const challenge = document.getElementById(`challenge-${challengeId}`);
+            const status = challenge.querySelector('.challenge-status');
+            const button = challenge.querySelector('.complete-challenge-btn');
+            
+            if (status.textContent === '待完成') {
+                challenge.classList.add('Completed');
+                status.textContent = '已完成';
+                status.className = 'challenge-status Completed';
+                button.textContent = '已完成';
+                button.disabled = true;
+                button.style.backgroundColor = '#4ecdc4';
+                
+                // 更新挑战计数
+                const challengesCount = document.getElementById('challenges-count');
+                challengesCount.textContent = parseInt(challengesCount.textContent) + 1;
+                
+                // 显示庆祝效果
+                createCelebration();
+            }
+        }
+        
+        // 创建庆祝效果
+        function createCelebration() {
+            const celebration = document.getElementById('celebration');
+            const confettiCount = 100;
+            const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#1a535c', '#ff9f1c'];
+            
+            // 清空之前的彩带
+            celebration.innerHTML = '';
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                
+                // 随机颜色和形状
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                // 随机大小
+                const size = Math.random() * 10 + 5;
+                confetti.style.width = size + 'px';
+                confetti.style.height = size + 'px';
+                
+                // 随机位置
+                confetti.style.left = Math.random() * 100 + '%';
+                
+                // 随机动画
+                confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                
+                celebration.appendChild(confetti);
+            }
+            
+            // 动画结束后清空
+            setTimeout(() => {
+                celebration.innerHTML = '';
+            }, 5000);
+        }
+        
+        // 点击空白区域关闭模态框
+        window.addEventListener('click', function(event) {
+            const milestoneModal = document.getElementById('milestone-modal');
+            const destinationModal = document.getElementById('next-destination-modal');
+            
+            if (event.target === milestoneModal) {
+                closeMilestoneModal();
+            }
+            if (event.target === destinationModal) {
+                closeNextDestinationModal();
+            }
+        });
+        
+        // ESC键关闭模态框
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeMilestoneModal();
+                closeNextDestinationModal();
+            }
+        });
+    </script>
+</body>
+</html>

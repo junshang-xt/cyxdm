@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创意小代码</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+        <!-- 地面粒子效果容器 -->
+        <div class="ground-dots"></div>
+        
+        <div class="container">
+            <h1>创意小代码</h1>
+            <div class="grid-container">
+                <!-- 生成36个按钮 -->
+                <button class="grid-button">表白吧</button>
+                <button class="grid-button">按钮 2</button>
+                <button class="grid-button">按钮 3</button>
+                <button class="grid-button">按钮 4</button>
+                <button class="grid-button">按钮 5</button>
+                <button class="grid-button">按钮 6</button>
+                <button class="grid-button">按钮 7</button>
+                <button class="grid-button">按钮 8</button>
+                <button class="grid-button">按钮 9</button>
+                <button class="grid-button">按钮 10</button>
+                <button class="grid-button">按钮 11</button>
+                <button class="grid-button">按钮 12</button>
+                <button class="grid-button">按钮 13</button>
+                <button class="grid-button">按钮 14</button>
+                <button class="grid-button">按钮 15</button>
+                <button class="grid-button">按钮 16</button>
+                <button class="grid-button">按钮 17</button>
+                <button class="grid-button">按钮 18</button>
+                <button class="grid-button">按钮 19</button>
+                <button class="grid-button">按钮 20</button>
+                <button class="grid-button">按钮 21</button>
+                <button class="grid-button">按钮 22</button>
+                <button class="grid-button">按钮 23</button>
+                <button class="grid-button">按钮 24</button>
+                <button class="grid-button">按钮 25</button>
+                <button class="grid-button">按钮 26</button>
+                <button class="grid-button">按钮 27</button>
+                <button class="grid-button">按钮 28</button>
+                <button class="grid-button">按钮 29</button>
+                <button class="grid-button">按钮 30</button>
+                <button class="grid-button">按钮 31</button>
+                <button class="grid-button">按钮 32</button>
+                <button class="grid-button">按钮 33</button>
+                <button class="grid-button">按钮 34</button>
+                <button class="grid-button">按钮 35</button>
+                <button class="grid-button">按钮 36</button>
+            </div>
+        </div>
+    <script src="script.js"></script>
+    <script>
+        // 为CSS添加粒子样式和按钮悬停效果
+        const style = document.createElement('style');
+        style.textContent = `
+            /* 增强按钮底部光晕的悬停效果 */
+            .grid-button:hover::before {
+                opacity: 1;
+                width: 80%;
+                height: 25px;
+            }
+            
+            /* 按钮点击时的下沉效果 */
+            .grid-button:active {
+                animation-play-state: paused;
+                transform: translateY(2px);
+            }
+            
+            /* 按钮点击时底部光晕的变化 */
+            .grid-button:active::before {
+                opacity: 0.4;
+                width: 50%;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

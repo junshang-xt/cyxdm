@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>专属页面 - 创意小代码</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .content-container {
+            text-align: center;
+            padding: 40px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, hsl(var(--hue, 200), 100%, 70%), hsl(var(--hue, 200), 100%, 50%));
+            background-size: 200% auto;
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+            animation: gradientShift 3s ease infinite;
+        }
+        
+        .page-content {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .back-button {
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            background: linear-gradient(135deg, hsl(var(--hue, 200), 100%, 70%), hsl(var(--hue, 200), 100%, 50%));
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="content-container">
+        <h1 class="page-title">专属页面 <span id="page-number">1</span> - 创意小代码</h1>
+        
+        <div class="page-content">
+            <p>欢迎来到专属页面 <span id="page-number-text">1</span>！</p>
+            <p>这是与主页第 <span id="page-number-text2">1</span> 个按钮关联的专属内容页面。</p>
+        </div>
+        
+        <a href="../index.html" class="back-button">返回首页</a>
+    </div>
+    
+    <script>
+        // 获取URL参数
+        const urlParams = new URLSearchParams(window.location.search);
+        const pageNum = urlParams.get('page') || 1;
+        
+        // 设置页面内容
+        document.getElementById('page-number').textContent = pageNum;
+        document.getElementById('page-number-text').textContent = pageNum;
+        document.getElementById('page-number-text2').textContent = pageNum;
+        
+        // 设置页面标题
+        document.title = `页面 ${pageNum} - 创意小代码`;
+        
+        // 设置颜色（基于页面号）
+        const hue = (pageNum * 10) % 360;
+        document.documentElement.style.setProperty('--hue', hue);
+        
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', () => {
+            const contentContainer = document.querySelector('.content-container');
+            contentContainer.style.opacity = '0';
+            contentContainer.style.transform = 'translateY(20px)';
+            contentContainer.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            
+            setTimeout(() => {
+                contentContainer.style.opacity = '1';
+                contentContainer.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

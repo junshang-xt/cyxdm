@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱的回忆 - 珍藏美好时光</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        /* 全局样式 */
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #fce38a 0%, #f38181 100%);
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* 页面容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 标题样式 */
+        h1 {
+            text-align: center;
+            color: #fff;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: #fff;
+            border-radius: 2px;
+            animation: pulseGrow 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulseGrow {
+            0% { width: 80px; }
+            50% { width: 120px; }
+            100% { width: 80px; }
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+        }
+        
+        /* 装饰元素 */
+        .decoration {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .heart-decoration {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 16px;
+            animation: floatHeart 10s ease-in-out infinite;
+        }
+        
+        @keyframes floatHeart {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-50px) rotate(180deg); opacity: 0.1; }
+        }
+        
+        /* 时间轴样式 */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            padding: 20px;
+        }
+        
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background: rgba(255, 255, 255, 0.6);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -3px;
+            border-radius: 3px;
+        }
+        
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            background-color: inherit;
+            width: 50%;
+            box-sizing: border-box;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease;
+        }
+        
+        .timeline-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border: 4px solid #f38181;
+            top: 15px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        
+        .left {
+            left: 0;
+        }
+        
+        .right {
+            left: 50%;
+        }
+        
+        .left::after {
+            right: -10px;
+        }
+        
+        .right::after {
+            left: -10px;
+        }
+        
+        .timeline-content {
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .timeline-content:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .timeline-content h3 {
+            margin-top: 0;
+            color: #f38181;
+        }
+        
+        .timeline-content p {
+            margin-bottom: 0;
+            color: #666;
+        }
+        
+        /* 照片墙样式 */
+        .photo-wall {
+            margin: 40px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .photo-wall h2 {
+            text-align: center;
+            color: #f38181;
+            margin-bottom: 20px;
+        }
+        
+        .photos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .photo {
+            position: relative;
+            aspect-ratio: 1/1;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .photo:hover {
+            transform: scale(1.05);
+        }
+        
+        .photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .photo:hover img {
+            transform: scale(1.1);
+        }
+        
+        .photo-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+            color: white;
+            padding: 10px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .photo:hover .photo-overlay {
+            transform: translateY(0);
+        }
+        
+        /* 添加回忆按钮 */
+        .add-memory-btn {
+            display: block;
+            margin: 30px auto;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #f38181, #fce38a);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(243, 129, 129, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .add-memory-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(243, 129, 129, 0.6);
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.4s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.3s ease;
+        }
+        
+        .close-btn:hover {
+            color: #f38181;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #f38181, #fce38a);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #e57373, #ffb74d);
+        }
+        
+        /* 照片查看器 */
+        .photo-viewer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .viewer-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        
+        .viewer-content img {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 8px;
+        }
+        
+        /* 爱心雨效果 */
+        .hearts-rain {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 999;
+            overflow: hidden;
+        }
+        
+        .rain-heart {
+            position: absolute;
+            color: #ff6b6b;
+            font-size: 20px;
+            animation: fallHeart linear infinite;
+            opacity: 0.7;
+        }
+        
+        @keyframes fallHeart {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* 加载动画 */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #fce38a 0%, #f38181 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .loader-circle {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top: 5px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .timeline::after {
+                left: 31px;
+            }
+            
+            .timeline-item {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 25px;
+            }
+            
+            .timeline-item.right {
+                left: 0;
+            }
+            
+            .left::after,
+            .right::after {
+                left: 21px;
+            }
+            
+            .photos {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .modal-content {
+                padding: 20px;
+                margin: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .photos {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .timeline-content {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 加载动画 -->
+    <div class="loader" id="loader">
+        <div class="loader-circle"></div>
+    </div>
+    
+    <!-- 装饰元素 -->
+    <div class="decoration" id="decoration"></div>
+    
+    <!-- 爱心雨效果 -->
+    <div class="hearts-rain" id="hearts-rain"></div>
+    
+    <div class="container">
+        <h1>爱的回忆</h1>
+        <p class="subtitle">珍藏我们一起走过的每一刻</p>
+        
+        <!-- 时间轴 -->
+        <div class="timeline" id="timeline">
+            <!-- 时间轴项目将通过JavaScript动态添加 -->
+            <div class="timeline-item left visible">
+                <div class="timeline-content">
+                    <h3>初次相遇</h3>
+                    <p>那一天，我们的故事开始了。一次偶然的相遇，注定了我们彼此生命中的重要篇章。</p>
+                </div>
+            </div>
+            <div class="timeline-item right visible">
+                <div class="timeline-content">
+                    <h3>第一次约会</h3>
+                    <p>阳光下的咖啡馆，我们聊了很久很久，仿佛时间都静止了。那一刻，我知道你是特别的。</p>
+                </div>
+            </div>
+            <div class="timeline-item left visible">
+                <div class="timeline-content">
+                    <h3>第一次旅行</h3>
+                    <p>一起看海，听着海浪的声音，感受彼此的心跳。这次旅行让我们的心更加靠近。</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 照片墙 -->
+        <div class="photo-wall">
+            <h2>美好瞬间</h2>
+            <div class="photos" id="photos">
+                <!-- 照片将通过JavaScript动态添加 -->
+                <div class="photo" onclick="openPhotoViewer('https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="浪漫瞬间">
+                    <div class="photo-overlay">
+                        <p>难忘的时光</p>
+                    </div>
+                </div>
+                <div class="photo" onclick="openPhotoViewer('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="浪漫瞬间">
+                    <div class="photo-overlay">
+                        <p>甜蜜的微笑</p>
+                    </div>
+                </div>
+                <div class="photo" onclick="openPhotoViewer('https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="浪漫瞬间">
+                    <div class="photo-overlay">
+                        <p>幸福的时刻</p>
+                    </div>
+                </div>
+                <div class="photo" onclick="openPhotoViewer('https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="浪漫瞬间">
+                    <div class="photo-overlay">
+                        <p>爱的旅程</p>
+                    </div>
+                </div>
+                <div class="photo" onclick="openPhotoViewer('https://images.unsplash.com/photo-1512950050685-b1d40201bf87?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1512950050685-b1d40201bf87?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="浪漫瞬间">
+                    <div class="photo-overlay">
+                        <p>永恒的记忆</p>
+                    </div>
+                </div>
+                <div class="photo" onclick="openPhotoViewer('https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="浪漫瞬间">
+                    <div class="photo-overlay">
+                        <p>共同的梦想</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 添加回忆按钮 -->
+        <button class="add-memory-btn" id="add-memory-btn">添加新回忆</button>
+    </div>
+    
+    <!-- 添加回忆模态框 -->
+    <div class="modal" id="memory-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2>记录美好回忆</h2>
+            <form id="memory-form">
+                <div class="form-group">
+                    <label for="memory-title">回忆标题</label>
+                    <input type="text" id="memory-title" placeholder="给这个回忆起个名字">
+                </div>
+                <div class="form-group">
+                    <label for="memory-content">回忆内容</label>
+                    <textarea id="memory-content" placeholder="描述这个特别的时刻..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="memory-date">日期</label>
+                    <input type="date" id="memory-date">
+                </div>
+                <button type="submit" class="submit-btn">保存回忆</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 照片查看器 -->
+    <div class="photo-viewer" id="photo-viewer" onclick="closePhotoViewer()">
+        <div class="viewer-content">
+            <img id="viewer-img" src="" alt="大图">
+        </div>
+    </div>
+    
+    <script>
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 隐藏加载动画
+            setTimeout(function() {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1000);
+            
+            // 创建装饰性心形
+            createDecorativeHearts();
+            
+            // 初始化时间轴动画
+            initTimelineAnimation();
+            
+            // 添加滚动监听，实现滚动时显示时间轴项目
+            window.addEventListener('scroll', checkTimelineVisibility);
+            
+            // 添加模态框事件监听
+            const addMemoryBtn = document.getElementById('add-memory-btn');
+            const memoryModal = document.getElementById('memory-modal');
+            
+            addMemoryBtn.addEventListener('click', function() {
+                memoryModal.style.display = 'flex';
+            });
+            
+            // 表单提交处理
+            const memoryForm = document.getElementById('memory-form');
+            memoryForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveNewMemory();
+            });
+        });
+        
+        // 创建装饰性心形
+        function createDecorativeHearts() {
+            const decoration = document.getElementById('decoration');
+            const heartCount = 20;
+            
+            for (let i = 0; i < heartCount; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart-decoration';
+                heart.textContent = '❤️';
+                
+                // 随机位置和动画延迟
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.top = Math.random() * 100 + '%';
+                heart.style.animationDelay = Math.random() * 5 + 's';
+                heart.style.animationDuration = Math.random() * 10 + 15 + 's';
+                heart.style.fontSize = Math.random() * 20 + 10 + 'px';
+                
+                decoration.appendChild(heart);
+            }
+        }
+        
+        // 初始化时间轴动画
+        function initTimelineAnimation() {
+            const timelineItems = document.querySelectorAll('.timeline-item');
+            
+            timelineItems.forEach(item => {
+                setTimeout(() => {
+                    item.classList.add('visible');
+                }, 300);
+            });
+        }
+        
+        // 检查时间轴项目是否可见
+        function checkTimelineVisibility() {
+            const timelineItems = document.querySelectorAll('.timeline-item:not(.visible)');
+            
+            timelineItems.forEach(item => {
+                const itemTop = item.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                
+                if (itemTop < windowHeight * 0.8) {
+                    item.classList.add('visible');
+                }
+            });
+        }
+        
+        // 打开模态框
+        function openModal() {
+            document.getElementById('memory-modal').style.display = 'flex';
+        }
+        
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('memory-modal').style.display = 'none';
+        }
+        
+        // 保存新回忆
+        function saveNewMemory() {
+            const title = document.getElementById('memory-title').value;
+            const content = document.getElementById('memory-content').value;
+            const date = document.getElementById('memory-date').value;
+            
+            if (!title || !content) {
+                alert('请填写标题和内容');
+                return;
+            }
+            
+            // 创建新的时间轴项目
+            const timeline = document.getElementById('timeline');
+            const lastItem = timeline.lastElementChild;
+            const isLeft = lastItem.classList.contains('right');
+            
+            const newItem = document.createElement('div');
+            newItem.className = 'timeline-item ' + (isLeft ? 'left' : 'right');
+            newItem.innerHTML = `
+                <div class="timeline-content">
+                    <h3>${title}</h3>
+                    <p>${content}</p>
+                    ${date ? '<small>' + date + '</small>' : ''}
+                </div>
+            `;
+            
+            timeline.appendChild(newItem);
+            
+            // 触发动画
+            setTimeout(() => {
+                newItem.classList.add('visible');
+            }, 100);
+            
+            // 触发爱心雨效果
+            createHeartsRain();
+            
+            // 关闭模态框并重置表单
+            closeModal();
+            document.getElementById('memory-form').reset();
+        }
+        
+        // 打开照片查看器
+        function openPhotoViewer(imageSrc) {
+            const viewer = document.getElementById('photo-viewer');
+            const viewerImg = document.getElementById('viewer-img');
+            
+            viewerImg.src = imageSrc;
+            viewer.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // 关闭照片查看器
+        function closePhotoViewer() {
+            document.getElementById('photo-viewer').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // 创建爱心雨效果
+        function createHeartsRain() {
+            const rainContainer = document.getElementById('hearts-rain');
+            const heartCount = 50;
+            
+            // 清空之前的爱心
+            rainContainer.innerHTML = '';
+            
+            for (let i = 0; i < heartCount; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'rain-heart';
+                heart.textContent = '❤️';
+                
+                // 随机位置和动画
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDuration = Math.random() * 3 + 2 + 's';
+                heart.style.animationDelay = Math.random() * 2 + 's';
+                heart.style.fontSize = Math.random() * 10 + 15 + 'px';
+                heart.style.opacity = Math.random() * 0.5 + 0.5;
+                
+                rainContainer.appendChild(heart);
+            }
+            
+            // 动画结束后移除爱心
+            setTimeout(() => {
+                rainContainer.innerHTML = '';
+            }, 5000);
+        }
+        
+        // 点击空白区域关闭模态框
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('memory-modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+        
+        // ESC键关闭模态框
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+                closePhotoViewer();
+            }
+        });
+        
+        // 添加返回顶部按钮功能
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 300) {
+                // 可以添加返回顶部按钮显示逻辑
+            }
+        });
+    </script>
+</body>
+</html>
