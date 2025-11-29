@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数字消消乐</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #FF5722 0%, #FF7043 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+        
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin: 30px auto;
+            width: 500px;
+            max-width: 100%;
+        }
+        
+        .game-cell {
+            aspect-ratio: 1;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            user-select: none;
+        }
+        
+        .game-cell:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .game-cell:active {
+            transform: scale(0.95);
+        }
+        
+        .game-cell.selected {
+            background: rgba(255, 193, 7, 0.6);
+            border-color: #FFC107;
+            transform: scale(1.1);
+        }
+        
+        .game-cell.merged {
+            animation: mergeAnimation 0.5s ease;
+        }
+        
+        @keyframes mergeAnimation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); background: rgba(255, 193, 7, 0.8); }
+            100% { transform: scale(1); }
+        }
+        
+        /* 数字方块的颜色样式 */
+        .number-2 {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .number-4 {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .number-8 {
+            background: rgba(255, 193, 7, 0.3);
+        }
+        
+        .number-16 {
+            background: rgba(255, 152, 0, 0.4);
+        }
+        
+        .number-32 {
+            background: rgba(255, 87, 34, 0.5);
+        }
+        
+        .number-64 {
+            background: rgba(244, 67, 54, 0.6);
+        }
+        
+        .number-128 {
+            background: rgba(233, 30, 99, 0.7);
+        }
+        
+        .number-256 {
+            background: rgba(156, 39, 176, 0.8);
+        }
+        
+        .number-512 {
+            background: rgba(103, 58, 183, 0.9);
+        }
+        
+        .number-1024 {
+            background: rgba(63, 81, 181, 1);
+        }
+        
+        .number-2048 {
+            background: rgba(33, 150, 243, 1);
+        }
+        
+        .control-panel {
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .back-button {
+            margin-top: 30px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .game-message {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .game-instructions {
+            margin-top: 15px;
+            font-size: 1rem;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+        
+        @media (max-width: 550px) {
+            .game-board {
+                width: 350px;
+                gap: 8px;
+            }
+            
+            .game-cell {
+                font-size: 1.3rem;
+            }
+            
+            .game-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>数字消消乐</h1>
+        <div class="game-info">
+            <div>得分: <span id="score">0</span></div>
+            <div>时间: <span id="time">60</span>秒</div>
+            <div>最高分: <span id="high-score">0</span></div>
+        </div>
+        
+        <div class="game-board" id="game-board"></div>
+        
+        <div class="control-panel">
+            <button id="start-button">开始游戏</button>
+            <button id="restart-button">重新开始</button>
+        </div>
+        
+        <div class="game-message" id="game-message">点击开始游戏，连接相同数字！</div>
+        
+        <div class="game-instructions">
+            玩法：点击相邻的相同数字方块进行合并，两个数字相同的方块合并后变成它们的和。目标是获得尽可能高的分数！
+        </div>
+        
+        <a href="../game_selection.html" class="back-button">返回游戏列表</a>
+    </div>
+    
+    <script>
+        // 获取DOM元素
+        const gameBoard = document.getElementById('game-board');
+        const scoreDisplay = document.getElementById('score');
+        const timeDisplay = document.getElementById('time');
+        const highScoreDisplay = document.getElementById('high-score');
+        const startButton = document.getElementById('start-button');
+        const restartButton = document.getElementById('restart-button');
+        const gameMessage = document.getElementById('game-message');
+        
+        // 游戏常量
+        const BOARD_SIZE = 6;
+        const INITIAL_TIME = 60;
+        
+        // 游戏状态
+        let gameActive = false;
+        let score = 0;
+        let highScore = localStorage.getItem('numberMergeHighScore') || 0;
+        let timeLeft = INITIAL_TIME;
+        let timerId = null;
+        let board = [];
+        let selectedCell = null;
+        
+        // 更新最高分显示
+        highScoreDisplay.textContent = highScore;
+        
+        // 初始化游戏板
+        function initBoard() {
+            board = [];
+            gameBoard.innerHTML = '';
+            
+            // 生成游戏板数据
+            for (let i = 0; i < BOARD_SIZE; i++) {
+                board[i] = [];
+                for (let j = 0; j < BOARD_SIZE; j++) {
+                    // 随机生成初始数字（主要是2和4）
+                    const random = Math.random();
+                    const value = random < 0.8 ? 2 : (random < 0.95 ? 4 : 8);
+                    board[i][j] = value;
+                    
+                    // 创建单元格元素
+                    createCell(i, j, value);
+                }
+            }
+        }
+        
+        // 创建游戏单元格
+        function createCell(row, col, value) {
+            const cell = document.createElement('div');
+            cell.classList.add('game-cell');
+            cell.classList.add(`number-${value}`);
+            cell.dataset.row = row;
+            cell.dataset.col = col;
+            cell.textContent = value;
+            
+            // 添加点击事件
+            cell.addEventListener('click', () => handleCellClick(cell));
+            
+            gameBoard.appendChild(cell);
+        }
+        
+        // 处理单元格点击
+        function handleCellClick(cell) {
+            if (!gameActive) return;
+            
+            const row = parseInt(cell.dataset.row);
+            const col = parseInt(cell.dataset.col);
+            const value = board[row][col];
+            
+            // 如果没有选中的单元格，选中当前单元格
+            if (!selectedCell) {
+                selectedCell = cell;
+                cell.classList.add('selected');
+                gameMessage.textContent = `已选中 ${value}，请选择相邻的相同数字。`;
+                return;
+            }
+            
+            // 如果点击的是已选中的单元格，取消选择
+            if (selectedCell === cell) {
+                cell.classList.remove('selected');
+                selectedCell = null;
+                gameMessage.textContent = '请选择一个数字方块。';
+                return;
+            }
+            
+            const selectedRow = parseInt(selectedCell.dataset.row);
+            const selectedCol = parseInt(selectedCell.dataset.col);
+            const selectedValue = board[selectedRow][selectedCol];
+            
+            // 检查是否相邻且数字相同
+            if (isAdjacent(selectedRow, selectedCol, row, col) && value === selectedValue) {
+                // 合并单元格
+                mergeCells(selectedRow, selectedCol, row, col);
+            } else {
+                // 选择新的单元格
+                selectedCell.classList.remove('selected');
+                selectedCell = cell;
+                cell.classList.add('selected');
+                gameMessage.textContent = `已选中 ${value}，请选择相邻的相同数字。`;
+            }
+        }
+        
+        // 检查两个单元格是否相邻
+        function isAdjacent(row1, col1, row2, col2) {
+            const rowDiff = Math.abs(row1 - row2);
+            const colDiff = Math.abs(col1 - col2);
+            return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
+        }
+        
+        // 合并单元格
+        function mergeCells(row1, col1, row2, col2) {
+            const value = board[row1][col1];
+            const mergedValue = value * 2;
+            
+            // 更新游戏板数据
+            board[row1][col1] = mergedValue;
+            board[row2][col2] = generateNewNumber();
+            
+            // 更新UI
+            updateCell(row1, col1, mergedValue, true);
+            updateCell(row2, col2, board[row2][col2], false);
+            
+            // 增加分数
+            score += mergedValue;
+            scoreDisplay.textContent = score;
+            
+            // 更新最高分
+            if (score > highScore) {
+                highScore = score;
+                highScoreDisplay.textContent = highScore;
+                localStorage.setItem('numberMergeHighScore', highScore);
+            }
+            
+            // 检查是否需要增加时间（合并较大数字时）
+            if (mergedValue >= 128) {
+                timeLeft += Math.floor(Math.log2(mergedValue) / 4);
+                timeDisplay.textContent = timeLeft;
+                gameMessage.textContent = `太棒了！合并出 ${mergedValue}，获得额外时间奖励！`;
+            } else {
+                gameMessage.textContent = `成功合并！获得 ${mergedValue}！`;
+            }
+            
+            // 清除选中状态
+            selectedCell.classList.remove('selected');
+            selectedCell = null;
+            
+            // 检查游戏是否结束（是否还有可合并的方块）
+            if (!hasPossibleMoves()) {
+                // 如果没有可合并的方块，添加更多方块
+                addNewCells();
+            }
+        }
+        
+        // 更新单元格
+        function updateCell(row, col, value, isMerged) {
+            const cells = document.querySelectorAll(`.game-cell[data-row="${row}"][data-col="${col}"]`);
+            if (cells.length > 0) {
+                const cell = cells[0];
+                
+                // 移除旧的数字类
+                cell.className = cell.className.replace(/number-\d+/, '');
+                
+                // 添加新的数字类
+                cell.classList.add(`number-${value}`);
+                cell.textContent = value;
+                
+                // 添加合并动画
+                if (isMerged) {
+                    cell.classList.add('merged');
+                    setTimeout(() => {
+                        cell.classList.remove('merged');
+                    }, 500);
+                }
+            }
+        }
+        
+        // 生成新数字
+        function generateNewNumber() {
+            const random = Math.random();
+            if (random < 0.7) return 2;
+            if (random < 0.9) return 4;
+            return 8;
+        }
+        
+        // 添加新的单元格
+        function addNewCells() {
+            // 找到空的位置并添加新数字（在这个游戏中，我们可以替换一些小数字）
+            const smallNumberCells = [];
+            
+            for (let i = 0; i < BOARD_SIZE; i++) {
+                for (let j = 0; j < BOARD_SIZE; j++) {
+                    if (board[i][j] <= 8) {
+                        smallNumberCells.push({row: i, col: j});
+                    }
+                }
+            }
+            
+            if (smallNumberCells.length > 0) {
+                // 随机选择一些单元格替换为新数字
+                const numToReplace = Math.min(5, smallNumberCells.length);
+                
+                for (let i = 0; i < numToReplace; i++) {
+                    const randomIndex = Math.floor(Math.random() * smallNumberCells.length);
+                    const cell = smallNumberCells.splice(randomIndex, 1)[0];
+                    
+                    board[cell.row][cell.col] = generateNewNumber();
+                    updateCell(cell.row, cell.col, board[cell.row][cell.col], false);
+                }
+            }
+        }
+        
+        // 检查是否还有可合并的移动
+        function hasPossibleMoves() {
+            for (let i = 0; i < BOARD_SIZE; i++) {
+                for (let j = 0; j < BOARD_SIZE; j++) {
+                    const value = board[i][j];
+                    
+                    // 检查右侧相邻
+                    if (j < BOARD_SIZE - 1 && board[i][j + 1] === value) {
+                        return true;
+                    }
+                    
+                    // 检查下方相邻
+                    if (i < BOARD_SIZE - 1 && board[i + 1][j] === value) {
+                        return true;
+                    }
+                }
+            }
+            
+            return false;
+        }
+        
+        // 开始游戏
+        function startGame() {
+            if (gameActive) return;
+            
+            gameActive = true;
+            score = 0;
+            timeLeft = INITIAL_TIME;
+            selectedCell = null;
+            
+            // 更新显示
+            scoreDisplay.textContent = score;
+            timeDisplay.textContent = timeLeft;
+            gameMessage.textContent = '游戏开始！选择相邻的相同数字进行合并。';
+            
+            // 初始化游戏板
+            initBoard();
+            
+            // 启动计时器
+            timerId = setInterval(() => {
+                timeLeft--;
+                timeDisplay.textContent = timeLeft;
+                
+                // 时间到，游戏结束
+                if (timeLeft <= 0) {
+                    gameOver();
+                }
+            }, 1000);
+        }
+        
+        // 游戏结束
+        function gameOver() {
+            gameActive = false;
+            clearInterval(timerId);
+            
+            gameMessage.textContent = `游戏结束！你的得分是 ${score}！`;
+            
+            // 添加游戏结束动画
+            const cells = document.querySelectorAll('.game-cell');
+            cells.forEach((cell, index) => {
+                setTimeout(() => {
+                    cell.style.transform = 'scale(1.2) rotate(10deg)';
+                    cell.style.opacity = '0.5';
+                }, index * 50);
+            });
+            
+            // 显示最终分数
+            setTimeout(() => {
+                alert(`游戏结束！\n最终得分：${score}\n最高分：${highScore}`);
+            }, 500);
+        }
+        
+        // 添加键盘控制（可选）
+        document.addEventListener('keydown', (e) => {
+            if (!gameActive || !selectedCell) return;
+            
+            const selectedRow = parseInt(selectedCell.dataset.row);
+            const selectedCol = parseInt(selectedCell.dataset.col);
+            let targetRow = selectedRow;
+            let targetCol = selectedCol;
+            
+            // 根据方向键确定目标单元格
+            switch (e.key) {
+                case 'ArrowUp':
+                    targetRow = Math.max(0, selectedRow - 1);
+                    break;
+                case 'ArrowDown':
+                    targetRow = Math.min(BOARD_SIZE - 1, selectedRow + 1);
+                    break;
+                case 'ArrowLeft':
+                    targetCol = Math.max(0, selectedCol - 1);
+                    break;
+                case 'ArrowRight':
+                    targetCol = Math.min(BOARD_SIZE - 1, selectedCol + 1);
+                    break;
+                default:
+                    return;
+            }
+            
+            // 如果目标单元格不同，尝试合并
+            if (targetRow !== selectedRow || targetCol !== selectedCol) {
+                const targetCells = document.querySelectorAll(`.game-cell[data-row="${targetRow}"][data-col="${targetCol}"]`);
+                if (targetCells.length > 0) {
+                    targetCells[0].click();
+                }
+            }
+        });
+        
+        // 按钮事件
+        startButton.addEventListener('click', startGame);
+        restartButton.addEventListener('click', () => {
+            if (gameActive) {
+                clearInterval(timerId);
+            }
+            startGame();
+        });
+        
+        // 初始化
+        initBoard();
+    </script>
+</body>
+</html>

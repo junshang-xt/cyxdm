@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五彩记忆方块</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .score-container {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 30px auto;
+            width: 400px;
+            max-width: 100%;
+        }
+        
+        .memory-tile {
+            aspect-ratio: 1;
+            border-radius: 10px;
+            background-color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid #555;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .memory-tile:hover {
+            transform: scale(1.05);
+        }
+        
+        .memory-tile:active {
+            transform: scale(0.95);
+        }
+        
+        .memory-tile.flipped {
+            cursor: default;
+        }
+        
+        .control-panel {
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .back-button {
+            margin-top: 30px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .game-message {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+        
+        @media (max-width: 480px) {
+            .game-board {
+                width: 300px;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>五彩记忆方块</h1>
+        <div class="score-container">
+            <div>得分: <span id="score">0</span></div>
+            <div>步数: <span id="steps">0</span></div>
+            <div>等级: <span id="level">1</span></div>
+        </div>
+        
+        <div class="game-board" id="game-board"></div>
+        
+        <div class="control-panel">
+            <button id="start-button">开始游戏</button>
+            <button id="restart-button">重新开始</button>
+        </div>
+        
+        <div class="game-message" id="game-message">点击开始游戏，记住亮起来的方块顺序！</div>
+        
+        <a href="../game_selection.html" class="back-button">返回游戏列表</a>
+    </div>
+    
+    <script>
+        // 游戏状态变量
+        let gameActive = false;
+        let score = 0;
+        let steps = 0;
+        let level = 1;
+        let sequence = [];
+        let playerSequence = [];
+        let currentStep = 0;
+        let tiles = [];
+        let boardSize = 4; // 4x4 网格
+        let sequenceSpeed = 1000; // 初始显示速度（毫秒）
+        
+        // 获取DOM元素
+        const gameBoard = document.getElementById('game-board');
+        const startButton = document.getElementById('start-button');
+        const restartButton = document.getElementById('restart-button');
+        const scoreDisplay = document.getElementById('score');
+        const stepsDisplay = document.getElementById('steps');
+        const levelDisplay = document.getElementById('level');
+        const gameMessage = document.getElementById('game-message');
+        
+        // 创建游戏方块
+        function createTiles() {
+            gameBoard.innerHTML = '';
+            tiles = [];
+            
+            // 定义方块颜色
+            const colors = [
+                '#FF5722', // 橙色
+                '#2196F3', // 蓝色
+                '#4CAF50', // 绿色
+                '#FFC107', // 黄色
+                '#9C27B0', // 紫色
+                '#F44336', // 红色
+                '#00BCD4', // 青色
+                '#FF9800', // 琥珀色
+                '#795548', // 棕色
+                '#607D8B', // 蓝灰色
+                '#3F51B5', // 靛蓝色
+                '#009688', // 蓝绿色
+                '#E91E63', // 粉红色
+                '#000000', // 黑色
+                '#FFFFFF', // 白色
+                '#CDDC39'  // 酸橙色
+            ];
+            
+            // 随机打乱颜色顺序
+            const shuffledColors = [...colors].sort(() => Math.random() - 0.5);
+            
+            for (let i = 0; i < boardSize * boardSize; i++) {
+                const tile = document.createElement('div');
+                tile.classList.add('memory-tile');
+                tile.dataset.index = i;
+                
+                // 设置方块颜色
+                const color = shuffledColors[i];
+                tile.dataset.color = color;
+                
+                // 添加点击事件
+                tile.addEventListener('click', () => handleTileClick(tile));
+                
+                gameBoard.appendChild(tile);
+                tiles.push(tile);
+            }
+        }
+        
+        // 处理方块点击
+        function handleTileClick(tile) {
+            if (!gameActive || currentStep >= sequence.length) return;
+            
+            const tileIndex = parseInt(tile.dataset.index);
+            
+            // 添加到玩家序列
+            playerSequence.push(tileIndex);
+            
+            // 高亮显示方块
+            highlightTile(tile);
+            
+            // 检查是否正确
+            if (playerSequence[currentStep] !== sequence[currentStep]) {
+                // 错误
+                gameOver();
+                return;
+            }
+            
+            currentStep++;
+            steps++;
+            updateScoreDisplay();
+            
+            // 如果完成了当前序列
+            if (currentStep === sequence.length) {
+                // 延迟显示下一个序列
+                setTimeout(() => {
+                    nextLevel();
+                }, 1000);
+            }
+        }
+        
+        // 高亮显示方块
+        function highlightTile(tile) {
+            const originalBg = tile.style.backgroundColor;
+            tile.style.backgroundColor = tile.dataset.color;
+            
+            setTimeout(() => {
+                tile.style.backgroundColor = originalBg;
+            }, 300);
+        }
+        
+        // 显示序列
+        function showSequence() {
+            gameActive = false;
+            gameMessage.textContent = '记住这个序列...';
+            
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i < sequence.length) {
+                    const tileIndex = sequence[i];
+                    const tile = tiles[tileIndex];
+                    
+                    // 闪烁效果
+                    tile.style.backgroundColor = tile.dataset.color;
+                    setTimeout(() => {
+                        tile.style.backgroundColor = '#333';
+                    }, sequenceSpeed / 2);
+                    
+                    i++;
+                } else {
+                    clearInterval(interval);
+                    // 让玩家开始
+                    gameActive = true;
+                    playerSequence = [];
+                    currentStep = 0;
+                    gameMessage.textContent = '轮到你了！点击方块重现序列。';
+                }
+            }, sequenceSpeed);
+        }
+        
+        // 开始游戏
+        function startGame() {
+            score = 0;
+            steps = 0;
+            level = 1;
+            sequence = [];
+            currentStep = 0;
+            sequenceSpeed = 1000;
+            
+            updateScoreDisplay();
+            createTiles();
+            
+            // 添加第一个随机方块
+            addRandomTile();
+            showSequence();
+        }
+        
+        // 下一关
+        function nextLevel() {
+            level++;
+            score += 100 * level;
+            
+            // 随着等级增加，序列显示速度加快
+            if (level % 3 === 0 && sequenceSpeed > 500) {
+                sequenceSpeed -= 100;
+            }
+            
+            updateScoreDisplay();
+            gameMessage.textContent = `恭喜！进入第 ${level} 关！`;
+            
+            // 添加新的随机方块到序列
+            addRandomTile();
+            
+            // 延迟显示新序列
+            setTimeout(() => {
+                showSequence();
+            }, 1500);
+        }
+        
+        // 添加随机方块到序列
+        function addRandomTile() {
+            const randomIndex = Math.floor(Math.random() * (boardSize * boardSize));
+            sequence.push(randomIndex);
+        }
+        
+        // 游戏结束
+        function gameOver() {
+            gameActive = false;
+            gameMessage.textContent = `游戏结束！你的分数是 ${score}，达到了第 ${level} 关！点击重新开始再试一次。`;
+            
+            // 闪烁所有方块
+            tiles.forEach(tile => {
+                tile.style.backgroundColor = '#F44336';
+            });
+            
+            setTimeout(() => {
+                tiles.forEach(tile => {
+                    tile.style.backgroundColor = '#333';
+                });
+            }, 500);
+        }
+        
+        // 更新分数显示
+        function updateScoreDisplay() {
+            scoreDisplay.textContent = score;
+            stepsDisplay.textContent = steps;
+            levelDisplay.textContent = level;
+        }
+        
+        // 添加事件监听器
+        startButton.addEventListener('click', startGame);
+        restartButton.addEventListener('click', startGame);
+        
+        // 初始化
+        createTiles();
+    </script>
+</body>
+</html>

@@ -66,7 +66,12 @@ window.addEventListener('DOMContentLoaded', () => {
             
             // 延迟跳转，给用户一个提示
             setTimeout(() => {
-                window.location.href = pageUrl;
+                // 特殊处理：按钮2（索引为1）跳转到游戏选择页面
+                if (index === 1) {
+                    window.location.href = 'game_selection.html';
+                } else {
+                    window.location.href = pageUrl;
+                }
             }, 800);
         }, 150);
         });

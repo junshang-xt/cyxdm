@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>重力弹球</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #2196F3 0%, #03A9F4 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+        
+        .game-container {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        #game-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        
+        .control-panel {
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .game-instructions {
+            margin-top: 15px;
+            font-size: 1rem;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+        
+        @media (max-width: 900px) {
+            .game-container {
+                width: 100%;
+                height: 500px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .game-container {
+                height: 400px;
+            }
+            
+            .game-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>重力弹球</h1>
+        <div class="game-info">
+            <div>得分: <span id="score">0</span></div>
+            <div>关卡: <span id="level">1</span></div>
+            <div>剩余时间: <span id="time">30</span>秒</div>
+        </div>
+        
+        <div class="game-container">
+            <canvas id="game-canvas"></canvas>
+        </div>
+        
+        <div class="control-panel">
+            <button id="start-button">开始游戏</button>
+            <button id="restart-button">重新开始</button>
+        </div>
+        
+        <div class="game-instructions">
+            玩法：倾斜手机或使用键盘方向键控制重力方向，让小球击中目标。按空格键发射小球。
+        </div>
+        
+        <a href="../game_selection.html" class="back-button">返回游戏列表</a>
+    </div>
+    
+    <script>
+        // 获取DOM元素
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('score');
+        const levelDisplay = document.getElementById('level');
+        const timeDisplay = document.getElementById('time');
+        const startButton = document.getElementById('start-button');
+        const restartButton = document.getElementById('restart-button');
+        const gameContainer = document.querySelector('.game-container');
+        
+        // 设置canvas尺寸
+        function resizeCanvas() {
+            const rect = gameContainer.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        
+        // 游戏状态
+        let gameActive = false;
+        let score = 0;
+        let level = 1;
+        let timeLeft = 30;
+        let gameLoopId = null;
+        let timerId = null;
+        
+        // 物理常量
+        const GRAVITY = 0.5;
+        const DAMPING = 0.8; // 反弹阻尼
+        
+        // 游戏对象
+        let ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: 20,
+            dx: 0,
+            dy: 0,
+            isLaunched: false,
+            color: '#FFEB3B'
+        };
+        
+        let targets = [];
+        let obstacles = [];
+        
+        // 重力方向（初始向下）
+        let gravityDirection = { x: 0, y: 1 };
+        
+        // 重置游戏
+        function resetGame() {
+            score = 0;
+            level = 1;
+            timeLeft = 30;
+            updateDisplays();
+            
+            initGameObjects();
+        }
+        
+        // 初始化游戏对象
+        function initGameObjects() {
+            // 重置球的位置
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height * 0.7;
+            ball.dx = 0;
+            ball.dy = 0;
+            ball.isLaunched = false;
+            
+            // 清空目标和障碍物
+            targets = [];
+            obstacles = [];
+            
+            // 添加目标
+            createTargets(level + 2);
+            
+            // 添加障碍物（随着关卡增加而增加）
+            createObstacles(Math.min(level, 5));
+        }
+        
+        // 创建目标
+        function createTargets(count) {
+            targets = [];
+            for (let i = 0; i < count; i++) {
+                const target = {
+                    x: Math.random() * (canvas.width - 60) + 30,
+                    y: Math.random() * (canvas.height * 0.5) + 30,
+                    radius: 15,
+                    color: '#FF5722',
+                    hit: false
+                };
+                targets.push(target);
+            }
+        }
+        
+        // 创建障碍物
+        function createObstacles(count) {
+            obstacles = [];
+            for (let i = 0; i < count; i++) {
+                const obstacle = {
+                    x: Math.random() * (canvas.width - 100) + 50,
+                    y: Math.random() * (canvas.height * 0.7) + 50,
+                    width: Math.random() * 80 + 60,
+                    height: Math.random() * 20 + 10,
+                    color: '#9E9E9E'
+                };
+                obstacles.push(obstacle);
+            }
+        }
+        
+        // 开始游戏
+        function startGame() {
+            if (gameActive) return;
+            
+            gameActive = true;
+            resetGame();
+            
+            // 启动游戏循环
+            gameLoopId = requestAnimationFrame(gameLoop);
+            
+            // 启动计时器
+            timerId = setInterval(() => {
+                timeLeft--;
+                timeDisplay.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    gameOver();
+                }
+            }, 1000);
+        }
+        
+        // 游戏结束
+        function gameOver() {
+            gameActive = false;
+            cancelAnimationFrame(gameLoopId);
+            clearInterval(timerId);
+            
+            alert(`游戏结束！你的分数是：${score}\n达到了第${level}关！`);
+        }
+        
+        // 下一关
+        function nextLevel() {
+            level++;
+            timeLeft = 30 + Math.min(level * 5, 60); // 每关增加时间，最多增加到90秒
+            
+            updateDisplays();
+            initGameObjects();
+        }
+        
+        // 更新显示
+        function updateDisplays() {
+            scoreDisplay.textContent = score;
+            levelDisplay.textContent = level;
+            timeDisplay.textContent = timeLeft;
+        }
+        
+        // 绘制游戏
+        function draw() {
+            // 清空画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制背景网格
+            drawGrid();
+            
+            // 绘制重力指示器
+            drawGravityIndicator();
+            
+            // 绘制障碍物
+            obstacles.forEach(obstacle => {
+                ctx.fillStyle = obstacle.color;
+                ctx.fillRect(obstacle.x - obstacle.width / 2, obstacle.y - obstacle.height / 2, 
+                           obstacle.width, obstacle.height);
+                
+                // 添加阴影效果
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                ctx.shadowBlur = 5;
+                ctx.shadowOffsetX = 3;
+                ctx.shadowOffsetY = 3;
+                ctx.fillRect(obstacle.x - obstacle.width / 2, obstacle.y - obstacle.height / 2, 
+                           obstacle.width, obstacle.height);
+                ctx.shadowColor = 'transparent';
+            });
+            
+            // 绘制目标
+            targets.forEach(target => {
+                if (!target.hit) {
+                    // 目标闪烁动画
+                    const pulse = 1 + Math.sin(Date.now() * 0.003) * 0.2;
+                    
+                    ctx.fillStyle = target.color;
+                    ctx.beginPath();
+                    ctx.arc(target.x, target.y, target.radius * pulse, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // 添加发光效果
+                    ctx.shadowColor = target.color;
+                    ctx.shadowBlur = 15;
+                    ctx.beginPath();
+                    ctx.arc(target.x, target.y, target.radius * 0.8 * pulse, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowColor = 'transparent';
+                }
+            });
+            
+            // 绘制球
+            drawBall();
+        }
+        
+        // 绘制球
+        function drawBall() {
+            // 添加发光效果
+            ctx.shadowColor = ball.color;
+            ctx.shadowBlur = 15;
+            
+            // 渐变填充
+            const gradient = ctx.createRadialGradient(
+                ball.x - ball.radius * 0.3, ball.y - ball.radius * 0.3, 0,
+                ball.x, ball.y, ball.radius
+            );
+            gradient.addColorStop(0, '#FFFFFF');
+            gradient.addColorStop(0.5, ball.color);
+            gradient.addColorStop(1, ball.color);
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.shadowColor = 'transparent';
+            
+            // 如果球未发射，显示发射指示器
+            if (!ball.isLaunched) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(ball.x, ball.y);
+                ctx.lineTo(ball.x - gravityDirection.x * 50, ball.y - gravityDirection.y * 50);
+                ctx.stroke();
+            }
+        }
+        
+        // 绘制网格背景
+        function drawGrid() {
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            
+            const gridSize = 40;
+            
+            // 绘制垂直线
+            for (let x = 0; x <= canvas.width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            
+            // 绘制水平线
+            for (let y = 0; y <= canvas.height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+        }
+        
+        // 绘制重力指示器
+        function drawGravityIndicator() {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.beginPath();
+            ctx.arc(30, 30, 25, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 绘制重力方向箭头
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(30, 30);
+            ctx.lineTo(30 + gravityDirection.x * 20, 30 + gravityDirection.y * 20);
+            ctx.stroke();
+            
+            // 箭头头部
+            const headLength = 8;
+            const angle = Math.atan2(gravityDirection.y, gravityDirection.x);
+            ctx.beginPath();
+            ctx.moveTo(30 + gravityDirection.x * 20,
+                       30 + gravityDirection.y * 20);
+            ctx.lineTo(30 + gravityDirection.x * 20 - headLength * Math.cos(angle - Math.PI / 6),
+                       30 + gravityDirection.y * 20 - headLength * Math.sin(angle - Math.PI / 6));
+            ctx.moveTo(30 + gravityDirection.x * 20,
+                       30 + gravityDirection.y * 20);
+            ctx.lineTo(30 + gravityDirection.x * 20 - headLength * Math.cos(angle + Math.PI / 6),
+                       30 + gravityDirection.y * 20 - headLength * Math.sin(angle + Math.PI / 6));
+            ctx.stroke();
+        }
+        
+        // 更新游戏状态
+        function update() {
+            if (!gameActive) return;
+            
+            // 更新球的位置
+            if (ball.isLaunched) {
+                // 应用重力
+                ball.dx += gravityDirection.x * GRAVITY;
+                ball.dy += gravityDirection.y * GRAVITY;
+                
+                // 更新位置
+                ball.x += ball.dx;
+                ball.y += ball.dy;
+                
+                // 检测边界碰撞
+                if (ball.x - ball.radius <= 0 || ball.x + ball.radius >= canvas.width) {
+                    ball.dx = -ball.dx * DAMPING;
+                    ball.x = Math.max(ball.radius, Math.min(canvas.width - ball.radius, ball.x));
+                }
+                
+                if (ball.y - ball.radius <= 0 || ball.y + ball.radius >= canvas.height) {
+                    ball.dy = -ball.dy * DAMPING;
+                    ball.y = Math.max(ball.radius, Math.min(canvas.height - ball.radius, ball.y));
+                }
+                
+                // 检测与障碍物的碰撞
+                obstacles.forEach(obstacle => {
+                    const closestX = Math.max(obstacle.x - obstacle.width / 2, Math.min(ball.x, obstacle.x + obstacle.width / 2));
+                    const closestY = Math.max(obstacle.y - obstacle.height / 2, Math.min(ball.y, obstacle.y + obstacle.height / 2));
+                    
+                    const distanceX = ball.x - closestX;
+                    const distanceY = ball.y - closestY;
+                    
+                    if (distanceX * distanceX + distanceY * distanceY <= ball.radius * ball.radius) {
+                        // 计算碰撞法线
+                        const normal = { x: distanceX, y: distanceY };
+                        const length = Math.sqrt(normal.x * normal.x + normal.y * normal.y);
+                        
+                        if (length > 0) {
+                            normal.x /= length;
+                            normal.y /= length;
+                        }
+                        
+                        // 分离球
+                        ball.x += normal.x * (ball.radius - length);
+                        ball.y += normal.y * (ball.radius - length);
+                        
+                        // 计算反射
+                        const dotProduct = ball.dx * normal.x + ball.dy * normal.y;
+                        ball.dx = (ball.dx - 2 * dotProduct * normal.x) * DAMPING;
+                        ball.dy = (ball.dy - 2 * dotProduct * normal.y) * DAMPING;
+                    }
+                });
+                
+                // 检测与目标的碰撞
+                let targetsHit = 0;
+                targets.forEach(target => {
+                    if (!target.hit) {
+                        const distance = Math.sqrt(
+                            Math.pow(ball.x - target.x, 2) + 
+                            Math.pow(ball.y - target.y, 2)
+                        );
+                        
+                        if (distance <= ball.radius + target.radius) {
+                            target.hit = true;
+                            score += 100;
+                            updateDisplays();
+                            
+                            // 添加击中效果（粒子等）
+                            createExplosion(target.x, target.y, target.color);
+                        }
+                    } else {
+                        targetsHit++;
+                    }
+                });
+                
+                // 检查是否所有目标都被击中
+                if (targetsHit === targets.length) {
+                    setTimeout(() => {
+                        nextLevel();
+                    }, 1000);
+                }
+                
+                // 摩擦力
+                ball.dx *= 0.99;
+                ball.dy *= 0.99;
+            }
+        }
+        
+        // 创建爆炸效果
+        function createExplosion(x, y, color) {
+            // 简单的爆炸效果可以在这里实现
+            // 例如创建一些粒子从中心向外扩散
+        }
+        
+        // 游戏主循环
+        function gameLoop() {
+            update();
+            draw();
+            
+            if (gameActive) {
+                gameLoopId = requestAnimationFrame(gameLoop);
+            }
+        }
+        
+        // 键盘控制
+        document.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'ArrowUp':
+                    gravityDirection = { x: 0, y: -1 };
+                    break;
+                case 'ArrowDown':
+                    gravityDirection = { x: 0, y: 1 };
+                    break;
+                case 'ArrowLeft':
+                    gravityDirection = { x: -1, y: 0 };
+                    break;
+                case 'ArrowRight':
+                    gravityDirection = { x: 1, y: 0 };
+                    break;
+                case ' ':
+                    // 空格键发射球
+                    if (gameActive && !ball.isLaunched) {
+                        ball.isLaunched = true;
+                        ball.dx = -gravityDirection.x * 10;
+                        ball.dy = -gravityDirection.y * 10;
+                    }
+                    break;
+            }
+        });
+        
+        // 触摸控制（手机倾斜模拟）
+        document.addEventListener('touchstart', (e) => {
+            if (!gameActive) return;
+            
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const touchX = touch.clientX - rect.left;
+            const touchY = touch.clientY - rect.top;
+            
+            // 根据触摸位置计算重力方向
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            const dx = touchX - centerX;
+            const dy = touchY - centerY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance > 0) {
+                gravityDirection = { x: dx / distance, y: dy / distance };
+            }
+            
+            // 如果球未发射，发射球
+            if (!ball.isLaunched) {
+                ball.isLaunched = true;
+                ball.dx = -gravityDirection.x * 10;
+                ball.dy = -gravityDirection.y * 10;
+            }
+        });
+        
+        // 按钮事件
+        startButton.addEventListener('click', startGame);
+        restartButton.addEventListener('click', () => {
+            if (gameActive) {
+                cancelAnimationFrame(gameLoopId);
+                clearInterval(timerId);
+            }
+            startGame();
+        });
+        
+        // 初始绘制
+        draw();
+    </script>
+</body>
+</html>

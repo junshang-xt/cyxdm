@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>色彩捕捉</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #3F51B5 0%, #5C6BC0 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            font-size: 2.5rem;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            font-size: 1.2rem;
+        }
+        
+        .game-area {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .target {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+        
+        .target.active:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        
+        .target.popped {
+            animation: popAnimation 0.5s ease-out forwards;
+        }
+        
+        @keyframes popAnimation {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+        }
+        
+        .time-bar-container {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .time-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);
+            transition: width linear;
+        }
+        
+        .target-preview {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .preview-item {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .control-panel {
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .back-button {
+            margin-top: 30px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .game-message {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .difficulty-selector {
+            margin-bottom: 20px;
+        }
+        
+        .difficulty-btn {
+            padding: 8px 16px;
+            margin: 0 5px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .difficulty-btn.active {
+            background: rgba(255, 193, 7, 0.6);
+            border-color: #FFC107;
+        }
+        
+        .combo-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: bold;
+            color: rgba(255, 235, 59, 0.8);
+            pointer-events: none;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .combo-display.active {
+            opacity: 1;
+            animation: comboFloat 1s ease-out;
+        }
+        
+        @keyframes comboFloat {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+            30% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+        
+        .score-animation {
+            position: absolute;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4CAF50;
+            pointer-events: none;
+            z-index: 20;
+            animation: scoreFloat 1s ease-out forwards;
+        }
+        
+        @keyframes scoreFloat {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-50px); opacity: 0; }
+        }
+        
+        .game-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 30;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        
+        .game-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .overlay-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .overlay-score {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 600px) {
+            .game-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .target {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .preview-item {
+                width: 30px;
+                height: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>色彩捕捉</h1>
+        
+        <div class="difficulty-selector">
+            <button class="difficulty-btn active" data-level="1">简单</button>
+            <button class="difficulty-btn" data-level="2">中等</button>
+            <button class="difficulty-btn" data-level="3">困难</button>
+        </div>
+        
+        <div class="game-info">
+            <div>分数: <span id="score">0</span></div>
+            <div>关卡: <span id="level">1</span></div>
+            <div>连击: <span id="combo">0</span></div>
+        </div>
+        
+        <div class="time-bar-container">
+            <div class="time-bar" id="time-bar"></div>
+        </div>
+        
+        <div class="target-preview" id="target-preview"></div>
+        
+        <div class="game-area" id="game-area">
+            <div class="combo-display" id="combo-animation">+连击!</div>
+            <div class="game-overlay" id="game-overlay">
+                <h2 class="overlay-title">游戏结束!</h2>
+                <div class="overlay-score">最终得分: <span id="final-score">0</span></div>
+                <button id="overlay-restart">再玩一次</button>
+            </div>
+        </div>
+        
+        <div class="control-panel">
+            <button id="start-button">开始游戏</button>
+            <button id="pause-button">暂停</button>
+        </div>
+        
+        <div class="game-message" id="game-message">选择难度，点击开始按钮，快速点击与上方预览相同颜色的目标！</div>
+        
+        <a href="../game_selection.html" class="back-button">返回游戏列表</a>
+    </div>
+    
+    <script>
+        // 获取DOM元素
+        const gameArea = document.getElementById('game-area');
+        const targetPreview = document.getElementById('target-preview');
+        const timeBar = document.getElementById('time-bar');
+        const scoreDisplay = document.getElementById('score');
+        const levelDisplay = document.getElementById('level');
+        const comboDisplay = document.getElementById('combo');
+        const comboAnimation = document.getElementById('combo-animation');
+        const gameMessage = document.getElementById('game-message');
+        const startButton = document.getElementById('start-button');
+        const pauseButton = document.getElementById('pause-button');
+        const difficultyButtons = document.querySelectorAll('.difficulty-btn');
+        const gameOverlay = document.getElementById('game-overlay');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const overlayRestartButton = document.getElementById('overlay-restart');
+        
+        // 游戏配置
+        const difficulties = {
+            1: { targetTime: 3000, targetsPerLevel: 3, colorVariance: 50 },
+            2: { targetTime: 2000, targetsPerLevel: 4, colorVariance: 30 },
+            3: { targetTime: 1500, targetsPerLevel: 5, colorVariance: 20 }
+        };
+        
+        // 游戏状态
+        let gameActive = false;
+        let paused = false;
+        let difficultyLevel = 1;
+        let difficulty = difficulties[difficultyLevel];
+        let score = 0;
+        let level = 1;
+        let combo = 0;
+        let currentTargetColor = null;
+        let targets = [];
+        let levelTimer = null;
+        let targetTimers = [];
+        let gameTimer = null;
+        let gameTimeLeft = 60; // 60秒游戏时间
+        
+        // 生成随机颜色
+        function generateRandomColor() {
+            const hue = Math.floor(Math.random() * 360);
+            return `hsl(${hue}, 100%, 50%)`;
+        }
+        
+        // 生成相似颜色
+        function generateSimilarColors(baseColor, count, variance) {
+            // 简单解析hsl颜色
+            const match = baseColor.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+            if (!match) return [];
+            
+            const [, baseHue, saturation, lightness] = match;
+            const colors = [baseColor];
+            
+            for (let i = 1; i < count; i++) {
+                // 生成类似但不同的颜色
+                const hue = (parseInt(baseHue) + Math.floor(Math.random() * variance * 2) - variance + 360) % 360;
+                const sat = Math.max(70, Math.min(100, parseInt(saturation) + Math.floor(Math.random() * 10) - 5));
+                const light = Math.max(40, Math.min(60, parseInt(lightness) + Math.floor(Math.random() * 10) - 5));
+                
+                colors.push(`hsl(${hue}, ${sat}%, ${light}%)`);
+            }
+            
+            // 打乱颜色顺序
+            return shuffleArray(colors);
+        }
+        
+        // 洗牌算法
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+        
+        // 显示目标预览
+        function showTargetPreview(targetColor) {
+            targetPreview.innerHTML = '';
+            
+            const previewItem = document.createElement('div');
+            previewItem.classList.add('preview-item');
+            previewItem.style.backgroundColor = targetColor;
+            previewItem.style.boxShadow = `0 0 20px ${targetColor}`;
+            
+            targetPreview.appendChild(previewItem);
+        }
+        
+        // 创建目标
+        function createTargets(colors) {
+            // 清空现有目标
+            targets.forEach(target => {
+                if (target.element && target.element.parentNode) {
+                    target.element.parentNode.removeChild(target.element);
+                }
+            });
+            targets = [];
+            
+            // 创建新目标
+            colors.forEach((color, index) => {
+                const target = document.createElement('div');
+                target.classList.add('target');
+                target.classList.add('active');
+                target.style.backgroundColor = color;
+                
+                // 随机位置
+                const left = Math.floor(Math.random() * (gameArea.offsetWidth - 60)) + 30;
+                const top = Math.floor(Math.random() * (gameArea.offsetHeight - 60)) + 30;
+                target.style.left = `${left}px`;
+                target.style.top = `${top}px`;
+                
+                // 点击事件
+                target.addEventListener('click', () => handleTargetClick(target, color));
+                
+                gameArea.appendChild(target);
+                
+                // 添加到目标数组
+                targets.push({
+                    element: target,
+                    color: color,
+                    isCorrect: color === currentTargetColor,
+                    timer: null
+                });
+                
+                // 设置消失定时器
+                const timer = setTimeout(() => {
+                    if (gameActive && !paused && target.classList.contains('active')) {
+                        if (color === currentTargetColor) {
+                            // 错过正确目标，重置连击
+                            resetCombo();
+                            gameMessage.textContent = '错过了正确目标！再接再厉！';
+                        }
+                        removeTarget(target);
+                    }
+                }, difficulty.targetTime);
+                
+                targetTimers.push(timer);
+            });
+        }
+        
+        // 处理目标点击
+        function handleTargetClick(target, color) {
+            if (!gameActive || paused || !target.classList.contains('active')) return;
+            
+            target.classList.remove('active');
+            target.classList.add('popped');
+            
+            // 清除该目标的定时器
+            targetTimers.forEach((timer, index) => {
+                clearTimeout(timer);
+                targetTimers.splice(index, 1);
+            });
+            
+            // 判断是否点击了正确的目标
+            if (color === currentTargetColor) {
+                // 正确点击
+                combo++;
+                const points = 100 * combo; // 连击加成
+                score += points;
+                
+                // 更新显示
+                scoreDisplay.textContent = score;
+                comboDisplay.textContent = combo;
+                gameMessage.textContent = `太棒了！连击 x${combo}，获得 ${points} 分！`;
+                
+                // 显示分数动画
+                showScoreAnimation(target, points);
+                
+                // 显示连击动画（当连击达到3以上时）
+                if (combo >= 3) {
+                    showComboAnimation();
+                }
+                
+                // 检查是否需要进入下一关
+                if (targets.every(t => !t.element.classList.contains('active'))) {
+                    setTimeout(() => {
+                        nextLevel();
+                    }, 500);
+                }
+            } else {
+                // 错误点击
+                score -= 50;
+                if (score < 0) score = 0;
+                scoreDisplay.textContent = score;
+                resetCombo();
+                gameMessage.textContent = '选错了！注意观察颜色！';
+            }
+            
+            // 移除目标
+            setTimeout(() => {
+                removeTarget(target);
+            }, 500);
+        }
+        
+        // 移除目标
+        function removeTarget(target) {
+            if (target && target.parentNode) {
+                target.parentNode.removeChild(target);
+                targets = targets.filter(t => t.element !== target);
+            }
+        }
+        
+        // 显示分数动画
+        function showScoreAnimation(target, points) {
+            const scoreElement = document.createElement('div');
+            scoreElement.classList.add('score-animation');
+            scoreElement.textContent = `+${points}`;
+            
+            // 定位在目标位置
+            const rect = target.getBoundingClientRect();
+            const gameAreaRect = gameArea.getBoundingClientRect();
+            
+            scoreElement.style.left = `${rect.left - gameAreaRect.left + rect.width / 2}px`;
+            scoreElement.style.top = `${rect.top - gameAreaRect.top + rect.height / 2}px`;
+            
+            gameArea.appendChild(scoreElement);
+            
+            // 动画结束后移除
+            setTimeout(() => {
+                if (scoreElement.parentNode) {
+                    scoreElement.parentNode.removeChild(scoreElement);
+                }
+            }, 1000);
+        }
+        
+        // 显示连击动画
+        function showComboAnimation() {
+            comboAnimation.classList.add('active');
+            
+            setTimeout(() => {
+                comboAnimation.classList.remove('active');
+            }, 1000);
+        }
+        
+        // 重置连击
+        function resetCombo() {
+            if (combo > 0) {
+                combo = 0;
+                comboDisplay.textContent = combo;
+            }
+        }
+        
+        // 进入下一关
+        function nextLevel() {
+            level++;
+            levelDisplay.textContent = level;
+            
+            // 增加难度
+            if (level % 3 === 0 && difficultyLevel < 3) {
+                difficultyLevel++;
+                difficulty = difficulties[difficultyLevel];
+                gameMessage.textContent = `难度提升！当前难度：${difficultyLevel === 1 ? '简单' : difficultyLevel === 2 ? '中等' : '困难'}`;
+                
+                // 更新难度按钮状态
+                difficultyButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (parseInt(btn.dataset.level) === difficultyLevel) {
+                        btn.classList.add('active');
+                    }
+                });
+            } else {
+                gameMessage.textContent = `第 ${level} 关！继续保持！`;
+            }
+            
+            // 增加游戏时间奖励
+            gameTimeLeft += 10;
+            updateTimeBar();
+            
+            // 生成新的关卡
+            generateLevel();
+        }
+        
+        // 生成关卡
+        function generateLevel() {
+            // 生成目标颜色
+            currentTargetColor = generateRandomColor();
+            
+            // 显示目标预览
+            showTargetPreview(currentTargetColor);
+            
+            // 生成相似颜色
+            const colors = generateSimilarColors(currentTargetColor, difficulty.targetsPerLevel, difficulty.colorVariance);
+            
+            // 创建目标
+            createTargets(colors);
+        }
+        
+        // 更新时间条
+        function updateTimeBar() {
+            const percentage = (gameTimeLeft / 60) * 100;
+            timeBar.style.width = `${percentage}%`;
+            
+            // 改变时间条颜色
+            if (percentage < 20) {
+                timeBar.style.background = 'linear-gradient(90deg, #F44336 0%, #FF5722 100%)';
+            } else if (percentage < 50) {
+                timeBar.style.background = 'linear-gradient(90deg, #FFC107 0%, #FFEB3B 100%)';
+            } else {
+                timeBar.style.background = 'linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%)';
+            }
+        }
+        
+        // 开始游戏计时器
+        function startGameTimer() {
+            gameTimeLeft = 60;
+            updateTimeBar();
+            
+            gameTimer = setInterval(() => {
+                if (!gameActive || paused) return;
+                
+                gameTimeLeft--;
+                updateTimeBar();
+                
+                if (gameTimeLeft <= 0) {
+                    gameOver();
+                }
+            }, 1000);
+        }
+        
+        // 停止游戏计时器
+        function stopGameTimer() {
+            clearInterval(gameTimer);
+            targetTimers.forEach(timer => clearTimeout(timer));
+            targetTimers = [];
+        }
+        
+        // 开始游戏
+        function startGame() {
+            if (gameActive) return;
+            
+            gameActive = true;
+            paused = false;
+            score = 0;
+            level = 1;
+            combo = 0;
+            difficulty = difficulties[difficultyLevel];
+            
+            // 更新显示
+            scoreDisplay.textContent = score;
+            levelDisplay.textContent = level;
+            comboDisplay.textContent = combo;
+            gameMessage.textContent = '游戏开始！快速点击与上方预览相同颜色的目标！';
+            
+            // 隐藏游戏结束画面
+            gameOverlay.classList.remove('active');
+            
+            // 开始计时
+            startGameTimer();
+            
+            // 生成第一关
+            generateLevel();
+        }
+        
+        // 暂停游戏
+        function pauseGame() {
+            if (!gameActive) return;
+            
+            paused = !paused;
+            
+            if (paused) {
+                gameMessage.textContent = '游戏已暂停，点击继续游戏';
+                pauseButton.textContent = '继续';
+            } else {
+                gameMessage.textContent = '游戏继续！';
+                pauseButton.textContent = '暂停';
+            }
+        }
+        
+        // 游戏结束
+        function gameOver() {
+            gameActive = false;
+            stopGameTimer();
+            
+            // 清除所有目标
+            targets.forEach(target => {
+                if (target.element && target.element.parentNode) {
+                    target.element.parentNode.removeChild(target.element);
+                }
+            });
+            targets = [];
+            
+            // 显示最终得分
+            finalScoreDisplay.textContent = score;
+            gameMessage.textContent = `游戏结束！最终得分：${score}`;
+            
+            // 显示游戏结束画面
+            setTimeout(() => {
+                gameOverlay.classList.add('active');
+            }, 500);
+        }
+        
+        // 设置难度
+        function setDifficulty(level) {
+            if (gameActive) {
+                if (!confirm('更改难度将重新开始游戏，确定继续吗？')) {
+                    return;
+                }
+                stopGameTimer();
+            }
+            
+            difficultyLevel = parseInt(level);
+            difficulty = difficulties[difficultyLevel];
+            
+            // 更新按钮状态
+            difficultyButtons.forEach(btn => {
+                btn.classList.remove('active');
+                if (parseInt(btn.dataset.level) === level) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            gameActive = false;
+            gameMessage.textContent = `难度已设置为${level === 1 ? '简单' : level === 2 ? '中等' : '困难'}。点击开始按钮开始游戏！`;
+        }
+        
+        // 事件监听
+        startButton.addEventListener('click', startGame);
+        pauseButton.addEventListener('click', pauseGame);
+        
+        // 难度选择
+        difficultyButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const level = btn.dataset.level;
+                setDifficulty(level);
+            });
+        });
+        
+        // 游戏结束画面的重新开始按钮
+        overlayRestartButton.addEventListener('click', startGame);
+        
+        // 初始化
+        gameMessage.textContent = '选择难度，点击开始按钮，快速点击与上方预览相同颜色的目标！';
+    </script>
+</body>
+</html>
